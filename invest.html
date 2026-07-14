@@ -24,7 +24,7 @@
         </a>
         <div>
           <h1 class="text-2xl md:text-3xl font-black text-[#faf8ef] tracking-wide">🏛️ GLOBAL 100 LIVE SIMULATOR</h1>
-          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ตสมจริง (ตลาดอ้างอิงรายตัว + บัญชีคำนวณต้นทุนถัวเฉลี่ยและกำไรเรียลไทม์)</p>
+          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ตสมจริง (ปุ่มซื้ออยู่ในตลาด / ปุ่มขายจะปรากฏในพอร์ตเมื่อถือครองสินทรัพย์)</p>
         </div>
       </div>
       <div class="text-center bg-[#8f7a66] px-5 py-2 rounded-xl">
@@ -76,7 +76,7 @@
                   <th class="p-4">สินทรัพย์</th>
                   <th class="p-4 text-right">ราคาล่าสุด (USD)</th>
                   <th class="p-4 text-right">เปลี่ยนแปลง</th>
-                  <th class="p-4 text-center">ส่งคำสั่งซื้อขาย (หน่วย)</th>
+                  <th class="p-4 text-center">ส่งคำสั่งซื้อ (เข้าพอร์ต)</th>
                 </tr>
               </thead>
               <tbody id="assets-tbody" class="divide-y divide-[#e5dbd0]/50 text-sm">
@@ -97,7 +97,7 @@
 
           <div class="max-h-[500px] overflow-y-auto flex flex-col gap-3 pr-1" id="portfolio-list">
             <div class="text-center py-8 text-[#9e948a] text-sm">
-              📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อเพื่อดูต้นทุนเฉลี่ยและกำไรสะสม
+              📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อจากตารางตลาดเพื่อสร้างพอร์ตของคุณ
             </div>
           </div>
 
@@ -124,7 +124,7 @@
     let netWorthUsd = 30000;
     let currentFilter = 'ALL';
 
-    // รายชื่อสินทรัพย์ 100 ตัว โดยเพิ่มฟิลด์ avgPrice (ราคาเฉลี่ยที่ซื้อมา) เพิ่มเติม
+    // รายชื่อสินทรัพย์ 100 ตัว
     let assets = [
       // === ETF ===
       { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", basePriceUsd: 520, priceUsd: 520, owned: 0, avgPrice: 0, change: 0 },
@@ -235,7 +235,6 @@
       { id: 99, symbol: "COPPER", name: "Copper ทองแดง", type: "METAL", priceUsd: 4.5, owned: 0, avgPrice: 0, change: 0 }
     ];
 
-    // โครงสร้างค่าความผันผวนของหุ้นย่อยที่อิงตลาดจริง
     const assetBehaviors = {
       "NVDA": { volt: 0.045, trend: 0.0015 },
       "TSLA": { volt: 0.040, trend: 0.0010 },
@@ -272,7 +271,6 @@
       document.getElementById('display-cash-thb').innerText = "≈ " + Math.floor(cashUsd * FX_RATE).toLocaleString() + " บาท";
       document.getElementById('display-networth-thb').innerText = "≈ " + Math.floor(netWorthUsd * FX_RATE).toLocaleString() + " บาท";
 
-      // อัปเดตฝั่งแถบพอร์ตโฟลิโอส่วนตัวทางขวา
       renderPortfolio();
     }
 
@@ -295,6 +293,7 @@
 
         let fixedUsd = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
 
+        // ตารางตลาดเหลือเฉพาะปุ่มส่งคำสั่ง "ซื้อ" เท่านั้น
         let row = `
           <tr class="hover:bg-[#fbf8f3] transition">
             <td class="p-4">
@@ -305,10 +304,8 @@
             <td class="p-4 text-right font-mono ${changeClass} text-xs">${changeText}</td>
             <td class="p-4 text-center">
               <div class="flex gap-1 justify-center">
-                <button onclick="trade(${a.id}, 'BUY', 1)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2 py-1 rounded font-bold transition">ซื้อ 1</button>
-                <button onclick="trade(${a.id}, 'BUY', 10)" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-2 py-1 rounded font-bold transition">ซื้อ 10</button>
-                <button onclick="trade(${a.id}, 'SELL', 1)" class="bg-rose-500 hover:bg-rose-400 text-white text-xs px-2 py-1 rounded font-bold transition">ขาย 1</button>
-                <button onclick="trade(${a.id}, 'SELL', 10)" class="bg-rose-600 hover:bg-rose-500 text-white text-xs px-2 py-1 rounded font-bold transition">ขาย 10</button>
+                <button onclick="trade(${a.id}, 'BUY', 1)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded font-bold transition">ซื้อ +1</button>
+                <button onclick="trade(${a.id}, 'BUY', 10)" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-3 py-1.5 rounded font-bold transition">ซื้อ +10</button>
               </div>
             </td>
           </tr>
@@ -317,7 +314,6 @@
       });
     }
 
-    // ฟังก์ชันใหม่: แสดงรายการพอร์ตโฟลิโอส่วนบุคคลทางขวา
     function renderPortfolio() {
       const portList = document.getElementById('portfolio-list');
       const ownedAssets = assets.filter(a => a.owned > 0);
@@ -327,7 +323,7 @@
       if (ownedAssets.length === 0) {
         portList.innerHTML = `
           <div class="text-center py-8 text-[#9e948a] text-sm">
-            📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อเพื่อดูต้นทุนเฉลี่ยและกำไรสะสม
+            📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อจากตารางตลาดเพื่อสร้างพอร์ตของคุณ
           </div>
         `;
         document.getElementById('port-total-assets-usd').innerText = "$0";
@@ -361,21 +357,27 @@
         let formatAvg = a.avgPrice < 0.1 ? a.avgPrice.toFixed(5) : a.avgPrice.toLocaleString(undefined, {maximumFractionDigits:2});
         let formatPrice = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
 
+        // เพิ่มปุ่ม "ขาย" สีแดงไว้ที่การ์ดสินทรัพย์ฝั่งพอร์ตโฟลิโอส่วนตัว
         html += `
-          <div class="bg-white border border-[#e5dbd0] p-3 rounded-xl flex flex-col gap-1 shadow-sm hover:border-[#f2b179] transition">
+          <div class="bg-white border border-[#e5dbd0] p-4 rounded-xl flex flex-col gap-2 shadow-sm hover:border-[#f2b179] transition">
             <div class="flex justify-between items-center">
               <span class="font-black text-[#776e65] text-base">${a.symbol} <span class="text-xs font-normal text-[#9e948a] ml-1">x${a.owned}</span></span>
               <span class="text-xs px-2 py-0.5 rounded font-bold uppercase ${a.type === 'ETF' ? 'bg-blue-100 text-blue-700' : a.type === 'STOCK' ? 'bg-orange-100 text-orange-700' : a.type === 'CRYPTO' ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700'}">${a.type}</span>
             </div>
             
-            <div class="grid grid-cols-2 text-xs text-[#9e948a] pt-1 border-t border-[#faf8ef]">
+            <div class="grid grid-cols-2 text-xs text-[#9e948a] py-1 border-t border-b border-[#faf8ef]">
               <div>เฉลี่ย (Avg): <span class="font-mono text-[#776e65] font-bold">$${formatAvg}</span></div>
               <div class="text-right">ตลาด (Price): <span class="font-mono text-[#776e65] font-bold">$${formatPrice}</span></div>
             </div>
 
-            <div class="flex justify-between items-center pt-1 border-t border-[#faf8ef] text-xs">
+            <div class="flex justify-between items-center text-xs">
               <span class="text-[#9e948a]">รวมมูลค่า: <span class="font-mono font-bold text-[#776e65]">$${currentVal.toLocaleString(undefined, {maximumFractionDigits:2})}</span></span>
               <span class="${plClass} font-mono">${plSign}$${plUsd.toLocaleString(undefined, {maximumFractionDigits:2})} (${plSign}${plPercent.toFixed(2)}%)</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#faf8ef]">
+              <button onclick="trade(${a.id}, 'SELL', 1)" class="bg-rose-500 hover:bg-rose-400 text-white text-[11px] py-1 rounded font-bold transition">ขาย -1</button>
+              <button onclick="trade(${a.id}, 'SELL', a.owned)" class="bg-rose-700 hover:bg-rose-600 text-white text-[11px] py-1 rounded font-bold transition">ขายหมดพอร์ต</button>
             </div>
           </div>
         `;
@@ -398,19 +400,24 @@
 
     function trade(id, action, quantity) {
       let asset = assets[id];
+      
+      // ปรับปรุงกรณีสั่ง "ขายทั้งหมดพอร์ต" ให้ปริมาณเท่ากับที่มีอยู่จริง ณ ตอนนั้น
+      if (action === 'SELL' && quantity === 'a.owned') {
+        quantity = asset.owned;
+      }
+      
       let totalCostUsd = asset.priceUsd * quantity;
 
       if (action === 'BUY') {
         if (cashUsd >= totalCostUsd) {
           cashUsd -= totalCostUsd;
           
-          // 🔥 คำนวณราคาเฉลี่ยถ่วงน้ำหนักใหม่ (Weighted Average Cost)
           let oldTotalCost = asset.owned * asset.avgPrice;
           let newTotalCost = oldTotalCost + totalCostUsd;
           asset.owned += quantity;
           asset.avgPrice = newTotalCost / asset.owned;
           
-          document.getElementById('display-status').innerText = `🛒 ซื้อสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ที่ราคา $${asset.priceUsd.toFixed(2)}`;
+          document.getElementById('display-status').innerText = `🛒 ซื้อสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย เข้าพอร์ตเรียบร้อย`;
         } else {
           alert(`เงินสด USD ไม่พอซื้อ!`);
         }
@@ -420,9 +427,9 @@
           cashUsd += totalCostUsd;
           
           if (asset.owned === 0) {
-            asset.avgPrice = 0; // ล้างประวัติเฉลี่ยหากไม่ได้ถือครองแล้ว
+            asset.avgPrice = 0; 
           }
-          document.getElementById('display-status').innerText = `💸 ขายสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ที่ราคา $${asset.priceUsd.toFixed(2)}`;
+          document.getElementById('display-status').innerText = `💸 ขายสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ออกจากพอร์ตแล้ว`;
         } else {
           alert(`คุณมีสินทรัพย์ไม่พอขาย!`);
         }
@@ -437,20 +444,15 @@
       document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมหุ้นและดัชนี ETF จริง...";
 
       setTimeout(() => {
-        // ขั้นตอนที่ 1: สุ่มปรับราคาหุ้นรายตัว (STOCK) และ โลหะ (METAL) ตามแนวโน้มจริง
         assets.forEach(a => {
           if (a.type === 'STOCK' || a.type === 'METAL') {
             const config = assetBehaviors[a.symbol] || { volt: 0.015, trend: 0.0003 };
-            
             const randomShock = (Math.random() * 2 - 1) * config.volt;
             const changePercent = config.trend + randomShock;
-
-            // บันทึกราคาเก่าเพื่อไปคำนวณ % เปลี่ยนแปลงในตาราง
             const oldPrice = a.priceUsd;
             a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
             a.change = (a.priceUsd - oldPrice) / oldPrice;
           }
-          // ขั้นตอนที่ 2: คริปโต สุ่มอิสระและผันผวนสูงมาก
           else if (a.type === 'CRYPTO') {
             const cryptoVolt = 0.06; 
             const changePercent = (Math.random() * 2 - 1.01) * cryptoVolt; 
@@ -460,16 +462,13 @@
           }
         });
 
-        // ฟังก์ชันช่วยหาการเติบโตเมื่อเทียบกับราคาตั้งต้น (Base Price)
-        // ถ้าไม่มี basePriceUsd ให้ใช้ราคาเริ่มต้นเป็นหลัก
         const getGrowth = (symbol) => {
           const item = assets.find(x => x.symbol === symbol);
           if (!item) return 1;
-          const initialPrice = item.basePriceUsd || 185; // Default fallback เป็นราคาเริ่มต้นทั่วไป
+          const initialPrice = item.basePriceUsd || 185; 
           return item.priceUsd / initialPrice;
         };
 
-        // ขั้นตอนที่ 3: คำนวณราคา ETF เชื่อมจากหุ้นย่อยที่อ้างอิงจริง
         assets.forEach(a => {
           if (a.type === 'ETF') {
             let trackedGrowth = 1;
@@ -498,7 +497,6 @@
                 getGrowth("AMD") * 0.05 + getGrowth("INTC") * 0.04 + getGrowth("ORCL") * 0.04
               );
             } else {
-              // ETF ตัวอื่นๆ ให้เฉลี่ยตามภาพรวมของหุ้น STOCK ทั้งหมดในระบบ
               const stocks = assets.filter(x => x.type === 'STOCK');
               let sumGrowth = 0;
               stocks.forEach(s => {
@@ -515,7 +513,7 @@
 
         let now = new Date();
         document.getElementById('display-time').innerText = now.toLocaleTimeString();
-        document.getElementById('display-status').innerText = "✅ จำลองปรับเปลี่ยนราคาตลาดเสร็จสิ้น (ราคา ETF ขยับตามตลาดแล้ว!)";
+        document.getElementById('display-status').innerText = "✅ จำลองปรับเปลี่ยนราคาตลาดเสร็จสิ้น (ราคา ETF อัปเดตผูกกับหุ้นย่อยเรียบร้อย)";
         updateDashboard();
         renderTable();
         btn.disabled = false;
