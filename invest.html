@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Global 100 Live Simulator 🏛️</title>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style>
+    /* แทรก Palette สีครีม-น้ำตาลมินิมอลเพิ่มเติมให้แมตช์กับธีมรวม */
+    .theme-bg { background-color: #faf8ef; }
+    .theme-card { background-color: #bbada0; }
+    .theme-dark-card { background-color: #8f7a66; }
+    .theme-text-main { color: #776e65; }
+    .theme-text-sub { color: #9e948a; }
+  </style>
+</head>
+<body class="theme-bg text-[#776e65] min-h-screen p-4 md:p-8 font-sans">
+
+  <div class="max-w-6xl mx-auto flex flex-col gap-6">
+    
+    <div class="flex flex-col md:flex-row justify-between items-center bg-[#bbada0] text-white p-6 rounded-2xl shadow-md gap-4">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="bg-[#8f7a66] hover:bg-[#7f6a56] text-white font-bold p-3 rounded-xl transition duration-200">
+          ⬅️ กลับหน้าหลัก
+        </a>
+        <div>
+          <h1 class="text-2xl md:text-3xl font-black text-[#faf8ef] tracking-wide">🏛️ GLOBAL 100 LIVE SIMULATOR</h1>
+          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ต 100 สินทรัพย์ระดับโลก (คู่ขนาน USD / THB)</p>
+        </div>
+      </div>
+      <div class="text-center bg-[#8f7a66] px-5 py-2 rounded-xl">
+        <p class="text-[10px] text-[#faf8ef] font-bold uppercase">⏱️ อัปเดตล่าสุด</p>
+        <p id="display-time" class="text-sm font-bold text-[#faf8ef]">กำลังโหลด...</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0]">
+        <p class="text-xs text-[#9e948a] uppercase font-bold">💰 สินทรัพย์รวมสุทธิ (Net Worth)</p>
+        <p id="display-networth-usd" class="text-2xl font-black mt-1 text-[#776e65]">$30,000</p>
+        <p id="display-networth-thb" class="text-xs text-[#9e948a]">≈ 1,050,000 บาท</p>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0]">
+        <p class="text-xs text-[#9e948a] uppercase font-bold">💵 เงินสดในมือ (Cash)</p>
+        <p id="display-cash-usd" class="text-2xl font-black mt-1 text-emerald-600">$30,000</p>
+        <p id="display-cash-thb" class="text-xs text-emerald-600/80">≈ 1,050,000 บาท</p>
+      </div>
+      <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0] flex items-center">
+        <button id="btn-refresh" onclick="refreshPrices()" class="w-full bg-[#f2b179] hover:bg-[#e59b5d] text-white font-black text-lg py-3 rounded-xl shadow transition transform active:scale-95">
+          🔄 อัปเดตราคา ($ USD)
+        </button>
+      </div>
+    </div>
+
+    <div id="display-status" class="bg-[#bbada0]/10 border-l-4 border-[#f59563] p-4 rounded-r-xl text-[#776e65] font-medium text-sm">
+      📢 ดึงข้อมูลพอร์ตสำเร็จ! ทุนเริ่มต้นของคุณคือ $30,000 USD สามารถคลิกคำสั่ง ซื้อ/ขาย บนกระดานได้ทันที
+    </div>
+
+    <div class="flex gap-2 border-b border-[#e5dbd0] pb-2 overflow-x-auto">
+      <button onclick="filterType('ALL')" id="tab-ALL" class="px-4 py-2 text-sm font-bold rounded-lg bg-[#8f7a66] text-white">ทั้งหมด (100)</button>
+      <button onclick="filterType('ETF')" id="tab-ETF" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">กองทุน ETF</button>
+      <button onclick="filterType('STOCK')" id="tab-STOCK" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">หุ้นรายตัว</button>
+      <button onclick="filterType('CRYPTO')" id="tab-CRYPTO" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">คริปโต/Coin</button>
+      <button onclick="filterType('METAL')" id="tab-METAL" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">ทอง/โลหะมีค่า</button>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-[#e5dbd0] overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#fbf8f3] text-[#9e948a] text-xs font-bold uppercase tracking-wider border-b border-[#e5dbd0]">
+              <th class="p-4">ชื่อย่อ / สินทรัพย์</th>
+              <th class="p-4">ประเภท</th>
+              <th class="p-4 text-right">ราคาปัจจุบัน (USD / THB)</th>
+              <th class="p-4 text-right">การเปลี่ยนแปลง</th>
+              <th class="p-4 text-right">จำนวนในพอร์ต</th>
+              <th class="p-4 text-center">คำสั่งซื้อขาย (ทีละ 1 / 10 หน่วย)</th>
+            </tr>
+          </thead>
+          <tbody id="assets-tbody" class="divide-y divide-[#e5dbd0]/50 text-sm">
+            </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const FX_RATE = 35; 
+    let cashUsd = 30000; 
+    let netWorthUsd = 30000;
+    let currentFilter = 'ALL';
+
+    // รายชื่อสินทรัพย์ 100 ตัว
+    let assets = [
+      // === ETF ===
+      { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", priceUsd: 520, owned: 0, change: 0 },
+      { id: 1, symbol: "QQQ", name: "Invesco QQQ Trust", type: "ETF", priceUsd: 440, owned: 0, change: 0 },
+      { id: 2, symbol: "DIA", name: "SPDR Dow Jones Industrial", type: "ETF", priceUsd: 390, owned: 0, change: 0 },
+      { id: 3, symbol: "IWM", name: "iShares Russell 2000 ETF", type: "ETF", priceUsd: 200, owned: 0, change: 0 },
+      { id: 4, symbol: "VTI", name: "Vanguard Total Stock Market", type: "ETF", priceUsd: 260, owned: 0, change: 0 },
+      { id: 5, symbol: "VXUS", name: "Vanguard Total International", type: "ETF", priceUsd: 60, owned: 0, change: 0 },
+      { id: 6, symbol: "EEM", name: "iShares MSCI Emerging Markets", type: "ETF", priceUsd: 42, owned: 0, change: 0 },
+      { id: 7, symbol: "VWO", name: "Vanguard FTSE Emerging Markets", type: "ETF", priceUsd: 45, owned: 0, change: 0 },
+      { id: 8, symbol: "VGK", name: "Vanguard FTSE Europe ETF", type: "ETF", priceUsd: 68, owned: 0, change: 0 },
+      { id: 9, symbol: "ARKK", name: "ARK Innovation ETF", type: "ETF", priceUsd: 48, owned: 0, change: 0 },
+      { id: 10, symbol: "XLK", name: "Technology Select Sector SPDR", type: "ETF", priceUsd: 210, owned: 0, change: 0 },
+      { id: 11, symbol: "XLV", name: "Health Care Select Sector SPDR", type: "ETF", priceUsd: 145, owned: 0, change: 0 },
+      { id: 12, symbol: "XLF", name: "Financial Select Sector SPDR", type: "ETF", priceUsd: 40, owned: 0, change: 0 },
+      { id: 13, symbol: "VNQ", name: "Vanguard Real Estate ETF", type: "ETF", priceUsd: 85, owned: 0, change: 0 },
+      { id: 14, symbol: "VT", name: "Vanguard Total World Stock", type: "ETF", priceUsd: 110, owned: 0, change: 0 },
+
+      // === หุ้นรายตัว ===
+      { id: 15, symbol: "AAPL", name: "Apple Inc.", type: "STOCK", priceUsd: 185, owned: 0, change: 0 },
+      { id: 16, symbol: "MSFT", name: "Microsoft Corporation", type: "STOCK", priceUsd: 415, owned: 0, change: 0 },
+      { id: 17, symbol: "NVDA", name: "NVIDIA Corporation", type: "STOCK", priceUsd: 120, owned: 0, change: 0 },
+      { id: 18, symbol: "AMZN", name: "Amazon.com, Inc.", type: "STOCK", priceUsd: 180, owned: 0, change: 0 },
+      { id: 19, symbol: "GOOGL", name: "Alphabet Inc.", type: "STOCK", priceUsd: 170, owned: 0, change: 0 },
+      { id: 20, symbol: "META", name: "Meta Platforms", type: "STOCK", priceUsd: 475, owned: 0, change: 0 },
+      { id: 21, symbol: "TSLA", name: "Tesla, Inc.", type: "STOCK", priceUsd: 175, owned: 0, change: 0 },
+      { id: 22, symbol: "BRK.B", name: "Berkshire Hathaway", type: "STOCK", priceUsd: 410, owned: 0, change: 0 },
+      { id: 23, symbol: "LLY", name: "Eli Lilly and Company", type: "STOCK", priceUsd: 790, owned: 0, change: 0 },
+      { id: 24, symbol: "AVGO", name: "Broadcom Inc.", type: "STOCK", priceUsd: 1300, owned: 0, change: 0 },
+      { id: 25, symbol: "JPM", name: "JPMorgan Chase & Co.", type: "STOCK", priceUsd: 195, owned: 0, change: 0 },
+      { id: 26, symbol: "V", name: "Visa Inc.", type: "STOCK", priceUsd: 275, owned: 0, change: 0 },
+      { id: 27, symbol: "XOM", name: "Exxon Mobil Corporation", type: "STOCK", priceUsd: 115, owned: 0, change: 0 },
+      { id: 28, symbol: "WMT", name: "Walmart Inc.", type: "STOCK", priceUsd: 65, owned: 0, change: 0 },
+      { id: 29, symbol: "MA", name: "Mastercard Incorporated", type: "STOCK", priceUsd: 450, owned: 0, change: 0 },
+      { id: 30, symbol: "UNH", name: "UnitedHealth Group", type: "STOCK", priceUsd: 510, owned: 0, change: 0 },
+      { id: 31, symbol: "ASML", name: "ASML Holding N.V.", type: "STOCK", priceUsd: 930, owned: 0, change: 0 },
+      { id: 32, symbol: "PG", name: "Procter & Gamble", type: "STOCK", priceUsd: 165, owned: 0, change: 0 },
+      { id: 33, symbol: "COST", name: "Costco Wholesale", type: "STOCK", priceUsd: 730, owned: 0, change: 0 },
+      { id: 34, symbol: "JNJ", name: "Johnson & Johnson", type: "STOCK", priceUsd: 155, owned: 0, change: 0 },
+      { id: 35, symbol: "ORCL", name: "Oracle Corporation", type: "STOCK", priceUsd: 125, owned: 0, change: 0 },
+      { id: 36, symbol: "HD", name: "The Home Depot", type: "STOCK", priceUsd: 340, owned: 0, change: 0 },
+      { id: 37, symbol: "BAC", name: "Bank of America", type: "STOCK", priceUsd: 38, owned: 0, change: 0 },
+      { id: 38, symbol: "KO", name: "The Coca-Cola Company", type: "STOCK", priceUsd: 62, owned: 0, change: 0 },
+      { id: 39, symbol: "NFLX", name: "Netflix, Inc.", type: "STOCK", priceUsd: 610, owned: 0, change: 0 },
+      { id: 40, symbol: "MRK", name: "Merck & Co., Inc.", type: "STOCK", priceUsd: 120, owned: 0, change: 0 },
+      { id: 41, symbol: "PEP", name: "PepsiCo, Inc.", type: "STOCK", priceUsd: 170, owned: 0, change: 0 },
+      { id: 42, symbol: "CVX", name: "Chevron Corporation", type: "STOCK", priceUsd: 155, owned: 0, change: 0 },
+      { id: 43, symbol: "AMD", name: "Advanced Micro Devices", type: "STOCK", priceUsd: 160, owned: 0, change: 0 },
+      { id: 44, symbol: "NKE", name: "NIKE, Inc.", type: "STOCK", priceUsd: 92, owned: 0, change: 0 },
+      { id: 45, symbol: "CRM", name: "Salesforce, Inc.", type: "STOCK", priceUsd: 270, owned: 0, change: 0 },
+      { id: 46, symbol: "ADBE", name: "Adobe Inc.", type: "STOCK", priceUsd: 480, owned: 0, change: 0 },
+      { id: 47, symbol: "TM", name: "Toyota Motor Corporation", type: "STOCK", priceUsd: 210, owned: 0, change: 0 },
+      { id: 48, symbol: "MCD", name: "McDonald's Corporation", type: "STOCK", priceUsd: 260, owned: 0, change: 0 },
+      { id: 49, symbol: "CSCO", name: "Cisco Systems, Inc.", type: "STOCK", priceUsd: 48, owned: 0, change: 0 },
+      { id: 50, symbol: "INTC", name: "Intel Corporation", type: "STOCK", priceUsd: 30, owned: 0, change: 0 },
+      { id: 51, symbol: "DIS", name: "The Walt Disney Company", type: "STOCK", priceUsd: 102, owned: 0, change: 0 },
+      { id: 52, symbol: "VZ", name: "Verizon Communications", type: "STOCK", priceUsd: 40, owned: 0, change: 0 },
+      { id: 53, symbol: "CMG", name: "Chipotle Mexican Grill", type: "STOCK", priceUsd: 60, owned: 0, change: 0 },
+      { id: 54, symbol: "IBM", name: "International Business Machines", type: "STOCK", priceUsd: 168, owned: 0, change: 0 },
+      { id: 55, symbol: "SBUX", name: "Starbucks Corporation", type: "STOCK", priceUsd: 88, owned: 0, change: 0 },
+      { id: 56, symbol: "CAT", name: "Caterpillar Inc.", type: "STOCK", priceUsd: 340, owned: 0, change: 0 },
+      { id: 57, symbol: "PFE", name: "Pfizer Inc.", type: "STOCK", priceUsd: 28, owned: 0, change: 0 },
+      { id: 58, symbol: "GE", name: "General Electric Company", type: "STOCK", priceUsd: 155, owned: 0, change: 0 },
+      { id: 59, symbol: "BA", name: "The Boeing Company", type: "STOCK", priceUsd: 175, owned: 0, change: 0 },
+      { id: 60, symbol: "SONY", name: "Sony Group Corporation", type: "STOCK", priceUsd: 82, owned: 0, change: 0 },
+      { id: 61, symbol: "UBER", name: "Uber Technologies, Inc.", type: "STOCK", priceUsd: 68, owned: 0, change: 0 },
+      { id: 62, symbol: "AIR.PA", name: "Airbus SE", type: "STOCK", priceUsd: 150, owned: 0, change: 0 },
+      { id: 63, symbol: "NVR", name: "NVR, Inc.", type: "STOCK", priceUsd: 7500, owned: 0, change: 0 },
+      { id: 64, symbol: "AAL", name: "American Airlines Group", type: "STOCK", priceUsd: 14, owned: 0, change: 0 },
+
+      // === คริปโต ===
+      { id: 65, symbol: "BTC", name: "Bitcoin", type: "CRYPTO", priceUsd: 60000, owned: 0, change: 0 },
+      { id: 66, symbol: "ETH", name: "Ethereum", type: "CRYPTO", priceUsd: 3000, owned: 0, change: 0 },
+      { id: 67, symbol: "BNB", name: "BNB (Binance)", type: "CRYPTO", priceUsd: 580, owned: 0, change: 0 },
+      { id: 68, symbol: "SOL", name: "Solana", type: "CRYPTO", priceUsd: 140, owned: 0, change: 0 },
+      { id: 69, symbol: "XRP", name: "Ripple", type: "CRYPTO", priceUsd: 0.5, owned: 0, change: 0 },
+      { id: 70, symbol: "ADA", name: "Cardano", type: "CRYPTO", priceUsd: 0.4, owned: 0, change: 0 },
+      { id: 71, symbol: "DOT", name: "Polkadot", type: "CRYPTO", priceUsd: 6.5, owned: 0, change: 0 },
+      { id: 72, symbol: "DOGE", name: "Dogecoin", type: "CRYPTO", priceUsd: 0.12, owned: 0, change: 0 },
+      { id: 73, symbol: "AVAX", name: "Avalanche", type: "CRYPTO", priceUsd: 25, owned: 0, change: 0 },
+      { id: 74, symbol: "LINK", name: "Chainlink", type: "CRYPTO", priceUsd: 14, owned: 0, change: 0 },
+      { id: 75, symbol: "MATIC", name: "Polygon MATIC", type: "CRYPTO", priceUsd: 0.7, owned: 0, change: 0 },
+      { id: 76, symbol: "LTC", name: "Litecoin", type: "CRYPTO", priceUsd: 80, owned: 0, change: 0 },
+      { id: 77, symbol: "UNI", name: "Uniswap", type: "CRYPTO", priceUsd: 7.5, owned: 0, change: 0 },
+      { id: 78, symbol: "SHIB", name: "Shiba Inu", type: "CRYPTO", priceUsd: 0.00002, owned: 0, change: 0 },
+      { id: 79, symbol: "ATOM", name: "Cosmos", type: "CRYPTO", priceUsd: 8.5, owned: 0, change: 0 },
+      { id: 80, symbol: "XLM", name: "Stellar Lumens", type: "CRYPTO", priceUsd: 0.11, owned: 0, change: 0 },
+      { id: 81, symbol: "XMR", name: "Monero", type: "CRYPTO", priceUsd: 160, owned: 0, change: 0 },
+      { id: 82, symbol: "ETC", name: "Ethereum Classic", type: "CRYPTO", priceUsd: 22, owned: 0, change: 0 },
+      { id: 83, symbol: "FIL", name: "Filecoin", type: "CRYPTO", priceUsd: 5.5, owned: 0, change: 0 },
+      { id: 84, symbol: "LDO", name: "Lido DAO", type: "CRYPTO", priceUsd: 2.1, owned: 0, change: 0 },
+      { id: 85, symbol: "APT", name: "Aptos", type: "CRYPTO", priceUsd: 8.2, owned: 0, change: 0 },
+      { id: 86, symbol: "SUI", name: "Sui Network", type: "CRYPTO", priceUsd: 1.2, owned: 0, change: 0 },
+      { id: 87, symbol: "NEAR", name: "NEAR Protocol", type: "CRYPTO", priceUsd: 4.5, owned: 0, change: 0 },
+      { id: 88, symbol: "OP", name: "Optimism", type: "CRYPTO", priceUsd: 2.3, owned: 0, change: 0 },
+      { id: 89, symbol: "ARB", name: "Arbitrum", type: "CRYPTO", priceUsd: 0.95, owned: 0, change: 0 },
+      { id: 90, symbol: "ICP", name: "Internet Computer", type: "CRYPTO", priceUsd: 11, owned: 0, change: 0 },
+      { id: 91, symbol: "VET", name: "VeChain", type: "CRYPTO", priceUsd: 0.03, owned: 0, change: 0 },
+      { id: 92, symbol: "MKR", name: "Maker", type: "CRYPTO", priceUsd: 2200, owned: 0, change: 0 },
+      { id: 93, symbol: "GRT", name: "The Graph", type: "CRYPTO", priceUsd: 0.22, owned: 0, change: 0 },
+      { id: 94, symbol: "RUNE", name: "THORChain", type: "CRYPTO", priceUsd: 5.5, owned: 0, change: 0 },
+
+      // === ทองคำ/โลหะ ===
+      { id: 95, symbol: "GOLD", name: "Gold (XAU/USD) ออนซ์", type: "METAL", priceUsd: 2350, owned: 0, change: 0 },
+      { id: 96, symbol: "SILVER", name: "Silver (XAG/USD) ออนซ์", type: "METAL", priceUsd: 28, owned: 0, change: 0 },
+      { id: 97, symbol: "PLAT", name: "Platinum ทองคำขาว ออนซ์", type: "METAL", priceUsd: 960, owned: 0, change: 0 },
+      { id: 98, symbol: "PALL", name: "Palladium พัลลาเดียม ออนซ์", type: "METAL", priceUsd: 1020, owned: 0, change: 0 },
+      { id: 99, symbol: "COPPER", name: "Copper ทองแดง", type: "METAL", priceUsd: 4.5, owned: 0, change: 0 }
+    ];
+
+    function updateDashboard() {
+      let currentPortfolioValueUsd = 0;
+      assets.forEach(a => { currentPortfolioValueUsd += a.owned * a.priceUsd; });
+      netWorthUsd = cashUsd + currentPortfolioValueUsd;
+
+      // แสดงผลฝั่ง USD
+      document.getElementById('display-cash-usd').innerText = "$" + Math.floor(cashUsd).toLocaleString();
+      document.getElementById('display-networth-usd').innerText = "$" + Math.floor(netWorthUsd).toLocaleString();
+      
+      // แสดงผลฝั่ง THB บาท
+      document.getElementById('display-cash-thb').innerText = "≈ " + Math.floor(cashUsd * FX_RATE).toLocaleString() + " บาท";
+      document.getElementById('display-networth-thb').innerText = "≈ " + Math.floor(netWorthUsd * FX_RATE).toLocaleString() + " บาท";
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('assets-tbody');
+      tbody.innerHTML = '';
+
+      assets.forEach(a => {
+        if (currentFilter !== 'ALL' && a.type !== currentFilter) return;
+
+        let changeText = "คงที่";
+        let changeClass = "text-slate-500";
+        if (a.change > 0) {
+          changeText = `▲ +${(a.change * 100).toFixed(2)}%`;
+          changeClass = "text-emerald-600 font-bold";
+        } else if (a.change < 0) {
+          changeText = `▼ ${(a.change * 100).toFixed(2)}%`;
+          changeClass = "text-rose-500 font-bold";
+        }
+
+        let priceThb = a.priceUsd * FX_RATE;
+        let fixedUsd = a.priceUsd < 1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
+        let fixedThb = priceThb < 1 ? priceThb.toFixed(4) : priceThb.toLocaleString(undefined, {maximumFractionDigits:2});
+
+        let row = `
+          <tr class="hover:bg-[#fbf8f3] transition">
+            <td class="p-4">
+              <span class="font-black text-[#f59563] block">${a.symbol}</span>
+              <span class="text-xs text-[#9e948a]">${a.name}</span>
+            </td>
+            <td class="p-4 text-xs font-bold text-[#9e948a] uppercase">${a.type}</td>
+            <td class="p-4 text-right font-mono font-bold text-[#776e65]">
+              <div>$${fixedUsd}</div>
+              <div class="text-xs text-[#9e948a]">฿${fixedThb}</div>
+            </td>
+            <td class="p-4 text-right font-mono ${changeClass}">${changeText}</td>
+            <td class="p-4 text-right font-mono font-black text-[#f2b179]">${a.owned}</td>
+            <td class="p-4 text-center">
+              <div class="flex gap-1 justify-center">
+                <button onclick="trade(${a.id}, 'BUY', 1)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2 py-1 rounded font-bold transition">ซื้อ 1</button>
+                <button onclick="trade(${a.id}, 'BUY', 10)" class="bg-emerald-700 hover:bg-emerald-600 text-white text-xs px-2 py-1 rounded font-bold transition">ซื้อ 10</button>
+                <button onclick="trade(${a.id}, 'SELL', 1)" class="bg-rose-500 hover:bg-rose-400 text-white text-xs px-2 py-1 rounded font-bold transition">ขาย 1</button>
+                <button onclick="trade(${a.id}, 'SELL', 10)" class="bg-rose-600 hover:bg-rose-500 text-white text-xs px-2 py-1 rounded font-bold transition">ขาย 10</button>
+              </div>
+            </td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function trade(id, action, quantity) {
+      let asset = assets[id];
+      let totalCostUsd = asset.priceUsd * quantity;
+
+      if (action === 'BUY') {
+        if (cashUsd >= totalCostUsd) {
+          cashUsd -= totalCostUsd;
+          asset.owned += quantity;
+        } else {
+          alert(`เงินสด USD ไม่พอซื้อ!`);
+        }
+      } else if (action === 'SELL') {
+        if (asset.owned >= quantity) {
+          asset.owned -= quantity;
+          cashUsd += totalCostUsd;
+        } else {
+          alert(`คุณมีสินทรัพย์ไม่พอขาย!`);
+        }
+      }
+      updateDashboard();
+      renderTable();
+    }
+
+    // ฟังก์ชันอัปเดตราคา เพื่อรองรับทั้งการรันผ่าน Google App Script และการรันแบบ Standalone บนหน้าเว็บตรงๆ
+    function refreshPrices() {
+      const btn = document.getElementById('btn-refresh');
+      btn.disabled = true;
+      document.getElementById('display-status').innerText = "⏳ อัปเดตราคาตลาดในระบบ...";
+
+      // เช็คว่ามี API ของ Google Apps Script หรือไม่
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        google.script.run.withSuccessHandler(function(updatedAssets) {
+          assets = updatedAssets;
+          let now = new Date();
+          document.getElementById('display-time').innerText = now.toLocaleTimeString();
+          document.getElementById('display-status').innerText = "✅ อัปเดตราคาตลาดคู่ขนาน (USD/THB) จากเซิร์ฟเวอร์สำเร็จ!";
+          updateDashboard();
+          renderTable();
+          btn.disabled = false;
+        }).fetchLivePrices(assets);
+      } else {
+        // หากเล่นบน Local หรือ GitHub Pages ตรงๆ ให้จำลองความผันผวนของราคา (Randomize)
+        setTimeout(() => {
+          assets.forEach(a => {
+            let changePercent = (Math.random() * 10 - 5) / 100; // สุ่มผันผวน -5% ถึง +5%
+            a.change = changePercent;
+            a.priceUsd = Math.max(0.00001, a.priceUsd * (1 + changePercent));
+          });
+          let now = new Date();
+          document.getElementById('display-time').innerText = now.toLocaleTimeString();
+          document.getElementById('display-status').innerText = "✅ จำลองอัปเดตราคาตลาดคู่ขนาน (USD/THB) สำเร็จ!";
+          updateDashboard();
+          renderTable();
+          btn.disabled = false;
+        }, 800);
+      }
+    }
+
+    function filterType(type) {
+      currentFilter = type;
+      ['ALL', 'ETF', 'STOCK', 'CRYPTO', 'METAL'].forEach(t => {
+        const btn = document.getElementById(`tab-${t}`);
+        if (t === type) {
+          btn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-[#8f7a66] text-white";
+        } else {
+          btn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]";
+        }
+      });
+      renderTable();
+    }
+
+    window.onload = function() {
+      refreshPrices(); 
+    };
+  </script>
+</body>
+</html>
