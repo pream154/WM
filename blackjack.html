@@ -277,7 +277,7 @@
     updateUI(false);
   }
 
-  function renderCardDOM(card, isHidden) {
+function renderCardDOM(card, isHidden) {
     const cardDiv = document.createElement('div');
     cardDiv.classList.add('card');
     
@@ -285,8 +285,10 @@
       cardDiv.classList.add('hidden-card');
       cardDiv.innerHTML = `<div>?</div><div class="card-suit">🎲</div>`;
     } else {
-      cardDiv.classList.add(card.suit.isRed ? 'red' : 'black');
-      cardDiv.innerHTML = `<div>${card.value}</div><div class="card-suit">${card.symbol}</div>`;
+      // แก้ไขจุดนี้: มั่นใจว่าสัญลักษณ์ส่งเข้าคลาสสีและแสดงผลถูกตัว
+      const isRed = card.suit.isRed;
+      cardDiv.classList.add(isRed ? 'red' : 'black');
+      cardDiv.innerHTML = `<div>${card.value}</div><div class="card-suit">${card.suit.symbol}</div>`;
     }
     return cardDiv;
   }
