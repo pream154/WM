@@ -377,7 +377,7 @@
 
             <div class="grid grid-cols-2 gap-2 pt-1 border-t border-[#faf8ef]">
               <button onclick="trade(${a.id}, 'SELL', 1)" class="bg-rose-500 hover:bg-rose-400 text-white text-[11px] py-1 rounded font-bold transition">ขาย -1</button>
-              <button onclick="trade(${a.id}, 'SELL', a.owned)" class="bg-rose-700 hover:bg-rose-600 text-white text-[11px] py-1 rounded font-bold transition">ขายหมดพอร์ต</button>
+              <button onclick="trade(${a.id}, 'SELL', ${a.owned})" class="bg-rose-700 hover:bg-rose-600 text-white text-[11px] py-1 rounded font-bold transition">ขายหมดพอร์ต</button>
             </div>
           </div>
         `;
@@ -399,44 +399,38 @@
     }
 
     function trade(id, action, quantity) {
-      let asset = assets[id];
-      
-      // ปรับปรุงกรณีสั่ง "ขายทั้งหมดพอร์ต" ให้ปริมาณเท่ากับที่มีอยู่จริง ณ ตอนนั้น
-      if (action === 'SELL' && quantity === 'a.owned') {
-        quantity = asset.owned;
-      }
-      
-      let totalCostUsd = asset.priceUsd * quantity;
+    let asset = assets[id];
+  let totalCostUsd = asset.priceUsd * quantity;
 
-      if (action === 'BUY') {
-        if (cashUsd >= totalCostUsd) {
-          cashUsd -= totalCostUsd;
-          
-          let oldTotalCost = asset.owned * asset.avgPrice;
-          let newTotalCost = oldTotalCost + totalCostUsd;
-          asset.owned += quantity;
-          asset.avgPrice = newTotalCost / asset.owned;
-          
-          document.getElementById('display-status').innerText = `🛒 ซื้อสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย เข้าพอร์ตเรียบร้อย`;
-        } else {
-          alert(`เงินสด USD ไม่พอซื้อ!`);
-        }
-      } else if (action === 'SELL') {
-        if (asset.owned >= quantity) {
-          asset.owned -= quantity;
-          cashUsd += totalCostUsd;
-          
-          if (asset.owned === 0) {
-            asset.avgPrice = 0; 
-          }
-          document.getElementById('display-status').innerText = `💸 ขายสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ออกจากพอร์ตแล้ว`;
-        } else {
-          alert(`คุณมีสินทรัพย์ไม่พอขาย!`);
-        }
-      }
-      updateDashboard();
-      renderTable();
+  if (action === 'BUY') {
+    if (cashUsd >= totalCostUsd) {
+      cashUsd -= totalCostUsd;
+      
+      let oldTotalCost = asset.owned * asset.avgPrice;
+      let newTotalCost = oldTotalCost + totalCostUsd;
+      asset.owned += quantity;
+      asset.avgPrice = newTotalCost / asset.owned;
+      
+      document.getElementById('display-status').innerText = `🛒 ซื้อสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย เข้าพอร์ตเรียบร้อย`;
+    } else {
+      alert(`เงินสด USD ไม่พอซื้อ!`);
     }
+  } else if (action === 'SELL') {
+    if (asset.owned >= quantity) {
+      asset.owned -= quantity;
+      cashUsd += totalCostUsd;
+      
+      if (asset.owned === 0) {
+        asset.avgPrice = 0; 
+      }
+      document.getElementById('display-status').innerText = `💸 ขายสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ออกจากพอร์ตแล้ว`;
+    } else {
+      alert(`คุณมีสินทรัพย์ไม่พอขาย!`);
+    }
+  }
+  updateDashboard();
+  renderTable();
+}
 
     function refreshPrices() {
       const btn = document.getElementById('btn-refresh');
