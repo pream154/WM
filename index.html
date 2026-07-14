@@ -1,437 +1,71 @@
 <!DOCTYPE html>
-<html>
+<html lang="th">
 <head>
-  <base target="_top">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Math Merge: Continuous Path Follow</title>
+  <title>My Web Portal 🚀</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #faf8ef;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
       margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      color: #776e65;
     }
-    .container {
-      text-align: center;
+    .portal-container {
       background: white;
-      padding: 25px;
+      padding: 40px;
       border-radius: 16px;
-      max-width: 420px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      text-align: center;
+      max-width: 450px;
       width: 100%;
     }
     h1 {
-      color: #776e65;
-      margin: 0 0 10px 0;
-      font-size: 2.3rem;
+      margin-bottom: 10px;
+      font-size: 2.2rem;
     }
-    .score-container {
-      background: #bbada0;
-      padding: 10px 25px;
-      border-radius: 6px;
-      color: white;
-      font-size: 1.2rem;
-      font-weight: bold;
-      display: inline-block;
-      margin-bottom: 20px;
+    p {
+      color: #9e948a;
+      margin-bottom: 30px;
     }
-    #score { font-size: 1.5rem; display: block; }
-    
-    .grid-wrapper {
-      position: relative;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      background-color: #bbada0;
-      padding: 12px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      position: relative;
-    }
-    .tile {
-      aspect-ratio: 1;
-      background-color: rgba(238, 228, 218, 0.35);
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.8rem;
-      font-weight: bold;
-      color: #776e65;
-      cursor: pointer;
-      user-select: none;
-      box-sizing: border-box;
-      position: relative;
-    }
-    
-    .tile-inner {
-      width: 100%;
-      height: 100%;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      /* ควบคุมการเลื่อนด้วยการเปลี่ยนตำแหน่งอย่างลื่นไหล */
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 10;
-    }
-    .tile:hover .tile-inner {
-      transform: scale(1.03);
-    }
-    .tile.selected .tile-inner {
-      box-shadow: 0 0 0 4px #776e65;
-      transform: scale(1.05);
-      z-index: 20;
-    }
-    
-    /* สีของตัวเลข */
-    [data-val="2"] { background-color: #eee4da; color: #776e65; }
-    [data-val="4"] { background-color: #ede0c8; color: #776e65; }
-    [data-val="8"] { background-color: #f2b179; color: #f9f6f2; }
-    [data-val="16"] { background-color: #f59563; color: #f9f6f2; }
-    [data-val="32"] { background-color: #f67c5f; color: #f9f6f2; }
-    [data-val="64"] { background-color: #f65e3b; color: #f9f6f2; }
-    [data-val="128"] { background-color: #edcf72; color: #f9f6f2; font-size: 1.6rem; }
-    [data-val="256"] { background-color: #edcc61; color: #f9f6f2; font-size: 1.6rem; }
-    [data-val="512"] { background-color: #edc850; color: #f9f6f2; font-size: 1.6rem; }
-    [data-val="1024"] { background-color: #edc53f; color: #f9f6f2; font-size: 1.3rem; }
-    [data-val="2048"] { background-color: #edc22e; color: #f9f6f2; font-size: 1.3rem; }
-    
-    /* Animations */
-    @keyframes mergePop {
-      0% { transform: scale(0.8); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
-    }
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      20%, 60% { transform: translateX(-5px); }
-      40%, 80% { transform: translateX(5px); }
-    }
-    .animate-merge { animation: mergePop 0.25s ease-out; }
-    .animate-wrong { animation: shake 0.25s ease-in-out; }
-
-    /* หน้าจอ Game Over */
-    .game-over-overlay {
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(238, 228, 218, 0.73);
-      border-radius: 10px;
+    .links-list {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      display: none;
-      z-index: 100;
+      gap: 15px;
     }
-    .game-over-overlay h2 {
-      font-size: 3rem;
-      color: #776e65;
-      margin: 0 0 10px 0;
-    }
-
-    button {
+    /* สไตล์ของปุ่มลิงก์ */
+    .project-link {
       background-color: #8f7a66;
       color: white;
-      border: none;
-      padding: 12px 24px;
+      text-decoration: none;
+      padding: 15px 20px;
+      border-radius: 8px;
       font-size: 1.1rem;
-      border-radius: 6px;
-      cursor: pointer;
       font-weight: bold;
+      transition: all 0.2s ease;
+      display: block;
     }
-    button:hover { background-color: #7f6a56; }
-    .instructions {
-      margin-top: 15px;
-      font-size: 0.95rem;
-      color: #776e65;
-      line-height: 1.5;
-      text-align: left;
-      background: #fbf8f3;
-      padding: 10px;
-      border-radius: 6px;
+    .project-link:hover {
+      background-color: #7f6a56;
+      transform: translateY(-2px);
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Math Merge: Path Follow 🎯</h1>
-  
-  <div class="score-container">
-    SCORE
-    <span id="score">0</span>
-  </div>
+<div class="portal-container">
+  <h1>My Workspace 🚀</h1>
+  <p>ยินดีต้อนรับเข้าสู่หน้าแรกของฉัน เลือกเปิดโปรเจกต์ด้านล่างนี้ได้เลยครับ:</p>
 
-  <div class="grid-wrapper">
-    <div class="grid" id="grid"></div>
-    <div class="game-over-overlay" id="gameOverScreen">
-      <h2>Game Over!</h2>
-      <button onclick="initGame()">ลองอีกครั้ง</button>
+  <div class="links-list">
+    <a href="mathmerge.html" class="project-link">🎯 เล่นเกม Math Merge</a>
+    
     </div>
-  </div>
-
-  <button onclick="initGame()">เริ่มเกมใหม่</button>
-  <div class="instructions">
-  </div>
 </div>
-
-<script>
-  let score = 0;
-  let gridData = [];
-  let selectedTile = null;
-  let isAnimating = false;
-  const size = 4;
-
-  function initGame() {
-    score = 0;
-    document.getElementById('score').innerText = score;
-    document.getElementById('gameOverScreen').style.display = 'none';
-    
-    gridData = Array(size * size).fill(0);
-    
-    addRandomTile();
-    addRandomTile();
-    addRandomTile();
-    
-    selectedTile = null;
-    isAnimating = false;
-    renderGrid();
-  }
-
-  function addRandomTile() {
-    const emptyTiles = [];
-    gridData.forEach((val, idx) => { if (val === 0) emptyTiles.push(idx); });
-    
-    if (emptyTiles.length > 0) {
-      const randomIdx = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
-      gridData[randomIdx] = Math.random() < 0.9 ? 2 : 4;
-    }
-  }
-
-  function rescueRandomTile() {
-    const emptyTiles = [];
-    const existingValues = [];
-    
-    gridData.forEach((val, idx) => { 
-      if (val === 0) emptyTiles.push(idx); 
-      else existingValues.push(val);
-    });
-
-    if (emptyTiles.length > 0 && existingValues.length > 0) {
-      const randomIdx = emptyTiles[Math.floor(Math.random() * emptyTiles.length)];
-      const randomValue = existingValues[Math.floor(Math.random() * existingValues.length)];
-      gridData[randomIdx] = randomValue;
-    }
-  }
-
-  function renderGrid() {
-    const gridElement = document.getElementById('grid');
-    gridElement.innerHTML = '';
-    
-    gridData.forEach((value, index) => {
-      const tile = document.createElement('div');
-      tile.classList.add('tile');
-      tile.dataset.index = index;
-      
-      const inner = document.createElement('div');
-      inner.classList.add('tile-inner');
-      
-      if (value > 0) {
-        inner.innerText = value;
-        inner.setAttribute('data-val', value);
-      }
-      
-      tile.appendChild(inner);
-      tile.addEventListener('click', () => handleTileClick(index));
-      gridElement.appendChild(tile);
-    });
-  }
-
-  function handleTileClick(index) {
-    if (isAnimating || gridData[index] === 0) return;
-
-    const tileElements = document.querySelectorAll('.tile');
-
-    if (selectedTile === null) {
-      selectedTile = index;
-      tileElements[index].classList.add('selected');
-    } else {
-      if (selectedTile === index) {
-        tileElements[index].classList.remove('selected');
-        selectedTile = null;
-        return;
-      }
-
-      const val1 = gridData[selectedTile];
-      const val2 = gridData[index];
-      
-      tileElements[selectedTile].classList.remove('selected');
-
-      if (val1 === val2) {
-        // หาเส้นทางแบบระบุขั้นตอน (Path Array)
-        const path = findPathArray(selectedTile, index);
-        
-        if (path && path.length > 1) {
-          isAnimating = true;
-          animatePathFollowing(path, val1, index);
-          return;
-        }
-      }
-      
-      // กรณีจับคู่ผิดหรือไม่มีเส้นทาง ให้แสดงเอฟเฟกต์สั่นเตือน
-      isAnimating = true;
-      const t1 = tileElements[selectedTile];
-      const t2 = tileElements[index];
-      t1.querySelector('.tile-inner').classList.add('animate-wrong');
-      t2.querySelector('.tile-inner').classList.add('animate-wrong');
-      
-      setTimeout(() => {
-        t1.querySelector('.tile-inner').classList.remove('animate-wrong');
-        t2.querySelector('.tile-inner').classList.remove('animate-wrong');
-        selectedTile = null;
-        isAnimating = false;
-      }, 250);
-    }
-  }
-
-  // อนิเมชันทำให้บล็อกขยับเลื่อนทีละบล็อกตามอาเรย์เส้นทางเดินจริง
-  function animatePathFollowing(path, originalValue, targetIndex) {
-    const tileElements = document.querySelectorAll('.tile');
-    const startIdx = path[0];
-    const element = tileElements[startIdx].querySelector('.tile-inner');
-    element.style.zIndex = '99';
-    
-    let currentStep = 0;
-    
-    function moveNext() {
-      if (currentStep >= path.length - 1) {
-        // เมื่อเดินทางถึงปลายทางสมบูรณ์ -> ทำการยุบรวมข้อมูล
-        const newValue = originalValue * 2;
-        gridData[targetIndex] = newValue;
-        gridData[selectedTile] = 0;
-        
-        score += newValue;
-        document.getElementById('score').innerText = score;
-        
-        addRandomTile();
-        checkAndRescueMode();
-        renderGrid();
-        
-        // เอฟเฟกต์เด้งฉลองของบล็อกใหม่
-        const newTiles = document.querySelectorAll('.tile');
-        if (newTiles[targetIndex]) {
-          newTiles[targetIndex].querySelector('.tile-inner').classList.add('animate-merge');
-        }
-        
-        selectedTile = null;
-        isAnimating = false;
-        
-        if (checkGameOverFinal()) {
-          document.getElementById('gameOverScreen').style.display = 'flex';
-        }
-        return;
-      }
-      
-      const currentIdx = path[currentStep];
-      const nextIdx = path[currentStep + 1];
-      
-      const currentTile = tileElements[currentIdx];
-      const nextTile = tileElements[nextIdx];
-      
-      const rectCurrent = currentTile.getBoundingClientRect();
-      const rectNext = nextTile.getBoundingClientRect();
-      const rectStart = tileElements[startIdx].getBoundingClientRect();
-      
-      // คำนวณหาค่าระยะห่างสะสมเทียบจากจุดเริ่มต้น (Start Grid Position)
-      const deltaX = rectNext.left - rectStart.left;
-      const deltaY = rectNext.top - rectStart.top;
-      
-      // ตั้งเวลาความเร็วการเคลื่อนที่ในแต่ละบล็อก (100ms ต่อช่อง)
-      element.style.transition = 'transform 0.1s linear';
-      element.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-      
-      currentStep++;
-      // ใช้ setTimeout เพื่อรอให้อนิเมชันช่องนี้เสร็จ แล้วก้าวไปช่องถัดไป
-      setTimeout(moveNext, 100);
-    }
-    
-    moveNext();
-  }
-
-  // ปรับเปลี่ยนระบบ BFS ให้ส่งกลับคืนมาเป็น Array เส้นทางเดินจริง [เริ่มต้น, ช่องว่าง1, ช่องว่าง2, ..., ปลายทาง]
-  function findPathArray(startIdx, endIdx) {
-    const queue = [[startIdx]];
-    const visited = new Set();
-    visited.add(startIdx);
-    
-    while (queue.length > 0) {
-      const path = queue.shift();
-      const current = path[path.length - 1];
-      
-      if (current === endIdx) return path;
-      
-      const neighbors = getNeighbors(current);
-      for (let neighbor of neighbors) {
-        if (!visited.has(neighbor)) {
-          if (gridData[neighbor] === 0 || neighbor === endIdx) {
-            visited.add(neighbor);
-            const newPath = [...path, neighbor];
-            queue.push(newPath);
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  function checkAndRescueMode() {
-    while (isBoardStuck() && gridData.includes(0)) {
-      rescueRandomTile();
-    }
-  }
-
-  function isBoardStuck() {
-    for (let i = 0; i < gridData.length; i++) {
-      if (gridData[i] === 0) continue;
-      for (let j = i + 1; j < gridData.length; j++) {
-        if (gridData[j] === 0) continue;
-        if (gridData[i] === gridData[j]) {
-          if (findPathArray(i, j) !== null) return false;
-        }
-      }
-    }
-    return true;
-  }
-
-  function getNeighbors(index) {
-    const neighbors = [];
-    const row = Math.floor(index / size);
-    const col = index % size;
-    
-    if (row > 0) neighbors.push(index - size);
-    if (row < size - 1) neighbors.push(index + size);
-    if (col > 0) neighbors.push(index - 1);
-    if (col < size - 1) neighbors.push(index + 1);
-    
-    return neighbors;
-  }
-
-  function checkGameOverFinal() {
-    return gridData.includes(0) ? false : isBoardStuck();
-  }
-
-  window.onload = initGame;
-</script>
 
 </body>
 </html>
