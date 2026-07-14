@@ -15,7 +15,7 @@
 </head>
 <body class="theme-bg text-[#776e65] min-h-screen p-4 md:p-8 font-sans">
 
-  <div class="max-w-6xl mx-auto flex flex-col gap-6">
+  <div class="max-w-7xl mx-auto flex flex-col gap-6">
     
     <div class="flex flex-col md:flex-row justify-between items-center bg-[#bbada0] text-white p-6 rounded-2xl shadow-md gap-4">
       <div class="flex items-center gap-4">
@@ -24,7 +24,7 @@
         </a>
         <div>
           <h1 class="text-2xl md:text-3xl font-black text-[#faf8ef] tracking-wide">🏛️ GLOBAL 100 LIVE SIMULATOR</h1>
-          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองราคาและคำนวณต้นทุนเฉลี่ย / กำไร-ขาดทุน รายตัวสมจริง</p>
+          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ตสมจริง (ตลาดอ้างอิงรายตัว + บัญชีคำนวณต้นทุนถัวเฉลี่ยและกำไรเรียลไทม์)</p>
         </div>
       </div>
       <div class="text-center bg-[#8f7a66] px-5 py-2 rounded-xl">
@@ -33,9 +33,9 @@
       </div>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
       <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0]">
-        <p class="text-xs text-[#9e948a] uppercase font-bold">💰 สินทรัพย์สุทธิ (Net Worth)</p>
+        <p class="text-xs text-[#9e948a] uppercase font-bold">💰 สินทรัพย์รวมสุทธิ (Net Worth)</p>
         <p id="display-networth-usd" class="text-2xl font-black mt-1 text-[#776e65]">$30,000</p>
         <p id="display-networth-thb" class="text-xs text-[#9e948a]">≈ 1,050,000 บาท</p>
       </div>
@@ -44,48 +44,76 @@
         <p id="display-cash-usd" class="text-2xl font-black mt-1 text-emerald-600">$30,000</p>
         <p id="display-cash-thb" class="text-xs text-emerald-600/80">≈ 1,050,000 บาท</p>
       </div>
-      <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0]">
-        <p class="text-xs text-[#9e948a] uppercase font-bold">📊 กำไร/ขาดทุนรวม (Total P&L)</p>
-        <p id="display-total-pnl-usd" class="text-2xl font-black mt-1 text-slate-500">$0.00</p>
-        <p id="display-total-pnl-percent" class="text-xs text-slate-500">0.00%</p>
-      </div>
       <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0] flex items-center">
-        <button id="btn-refresh" onclick="refreshPrices()" class="w-full bg-[#f2b179] hover:bg-[#e59b5d] text-white font-black text-base py-3 rounded-xl shadow transition transform active:scale-95">
-          🔄 จำลองอัปเดตราคาตลาด
+        <button id="btn-refresh" onclick="refreshPrices()" class="w-full bg-[#f2b179] hover:bg-[#e59b5d] text-white font-black text-lg py-3 rounded-xl shadow transition transform active:scale-95">
+          🔄 จำลองอัปเดตราคา ($ USD)
         </button>
       </div>
     </div>
 
     <div id="display-status" class="bg-[#bbada0]/10 border-l-4 border-[#f59563] p-4 rounded-r-xl text-[#776e65] font-medium text-sm">
-      📢 ระบบพร้อมใช้งาน! ทดลองคลิก "ซื้อ" สินทรัพย์เพื่อเริ่มสร้างพอร์ต ต้นทุนเฉลี่ยและกำไรจะคำนวณให้ทันทีตามราคาในตาราง
+      📢 เปิดพอร์ตสำเร็จ! ทุนเริ่มต้นของคุณคือ $30,000 USD สามารถเลือกซื้อหุ้น ทองคำ หรือ ETF เพื่อรับการวิเคราะห์ผลตอบแทนได้ทันที
     </div>
 
-    <div class="flex gap-2 border-b border-[#e5dbd0] pb-2 overflow-x-auto">
-      <button onclick="filterType('ALL')" id="tab-ALL" class="px-4 py-2 text-sm font-bold rounded-lg bg-[#8f7a66] text-white">ทั้งหมด (100)</button>
-      <button onclick="filterType('ETF')" id="tab-ETF" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">กองทุน ETF</button>
-      <button onclick="filterType('STOCK')" id="tab-STOCK" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">หุ้นรายตัว</button>
-      <button onclick="filterType('CRYPTO')" id="tab-CRYPTO" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">คริปโต/Coin</button>
-      <button onclick="filterType('METAL')" id="tab-METAL" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">ทอง/โลหะมีค่า</button>
-    </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      
+      <div class="lg:col-span-8 flex flex-col gap-4">
+        <div class="flex justify-between items-center border-b border-[#e5dbd0] pb-2">
+          <div class="flex gap-2 overflow-x-auto">
+            <button onclick="filterType('ALL')" id="tab-ALL" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-[#8f7a66] text-white whitespace-nowrap">ทั้งหมด (100)</button>
+            <button onclick="filterType('ETF')" id="tab-ETF" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">กองทุน ETF</button>
+            <button onclick="filterType('STOCK')" id="tab-STOCK" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">หุ้นรายตัว</button>
+            <button onclick="filterType('CRYPTO')" id="tab-CRYPTO" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">คริปโต/Coin</button>
+            <button onclick="filterType('METAL')" id="tab-METAL" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">ทอง/โลหะมีค่า</button>
+          </div>
+        </div>
 
-    <div class="bg-white rounded-2xl border border-[#e5dbd0] overflow-hidden shadow-sm">
-      <div class="overflow-x-auto">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-[#fbf8f3] text-[#9e948a] text-xs font-bold uppercase tracking-wider border-b border-[#e5dbd0]">
-              <th class="p-4">ชื่อย่อ / สินทรัพย์</th>
-              <th class="p-4">ประเภท</th>
-              <th class="p-4 text-right">ราคาปัจจุบัน</th>
-              <th class="p-4 text-right">24h Change</th>
-              <th class="p-4 text-right">จำนวน & ต้นทุนเฉลี่ย</th>
-              <th class="p-4 text-right">กำไร / ขาดทุน (P&L)</th>
-              <th class="p-4 text-center">คำสั่งซื้อขาย (ทีละ 1 / 10 หน่วย)</th>
-            </tr>
-          </thead>
-          <tbody id="assets-tbody" class="divide-y divide-[#e5dbd0]/50 text-sm">
-            </tbody>
-        </table>
+        <div class="bg-white rounded-2xl border border-[#e5dbd0] overflow-hidden shadow-sm">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-[#fbf8f3] text-[#9e948a] text-xs font-bold uppercase tracking-wider border-b border-[#e5dbd0]">
+                  <th class="p-4">สินทรัพย์</th>
+                  <th class="p-4 text-right">ราคาล่าสุด (USD)</th>
+                  <th class="p-4 text-right">เปลี่ยนแปลง</th>
+                  <th class="p-4 text-center">ส่งคำสั่งซื้อขาย (หน่วย)</th>
+                </tr>
+              </thead>
+              <tbody id="assets-tbody" class="divide-y divide-[#e5dbd0]/50 text-sm">
+                </tbody>
+            </table>
+          </div>
+        </div>
       </div>
+
+      <div class="lg:col-span-4 sticky top-6">
+        <div class="bg-white rounded-2xl border border-[#e5dbd0] shadow-sm p-5 flex flex-col gap-4">
+          <div class="flex justify-between items-center border-b border-[#e5dbd0] pb-3">
+            <h3 class="font-black text-lg text-[#776e65] flex items-center gap-2">
+              💼 พอร์ตโฟลิโอของฉัน <span id="portfolio-count" class="bg-[#8f7a66] text-white text-xs px-2 py-0.5 rounded-full">0</span>
+            </h3>
+            <span class="text-xs font-bold text-[#9e948a]">สรุปยอดถือครอง</span>
+          </div>
+
+          <div class="max-h-[500px] overflow-y-auto flex flex-col gap-3 pr-1" id="portfolio-list">
+            <div class="text-center py-8 text-[#9e948a] text-sm">
+              📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อเพื่อดูต้นทุนเฉลี่ยและกำไรสะสม
+            </div>
+          </div>
+
+          <div class="bg-[#fbf8f3] p-4 rounded-xl border border-[#e5dbd0] text-xs flex flex-col gap-2">
+            <div class="flex justify-between">
+              <span class="text-[#9e948a]">มูลค่าหุ้นและสินทรัพย์รวม:</span>
+              <span id="port-total-assets-usd" class="font-bold text-[#776e65]">$0</span>
+            </div>
+            <div class="flex justify-between border-t border-[#e5dbd0]/70 pt-2 font-bold">
+              <span>รวมกำไร/ขาดทุนสะสม:</span>
+              <span id="port-total-pl" class="text-slate-500">+$0 (0%)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
   </div>
@@ -96,7 +124,7 @@
     let netWorthUsd = 30000;
     let currentFilter = 'ALL';
 
-    // รายชื่อสินทรัพย์ 100 ตัว โดยเพิ่มคุณสมบัติ avgPrice (ต้นทุนเฉลี่ย) เข้ามา
+    // รายชื่อสินทรัพย์ 100 ตัว โดยเพิ่มฟิลด์ avgPrice (ราคาเฉลี่ยที่ซื้อมา) เพิ่มเติม
     let assets = [
       // === ETF ===
       { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", basePriceUsd: 520, priceUsd: 520, owned: 0, avgPrice: 0, change: 0 },
@@ -200,14 +228,14 @@
       { id: 94, symbol: "RUNE", name: "THORChain", type: "CRYPTO", priceUsd: 5.5, owned: 0, avgPrice: 0, change: 0 },
 
       // === ทองคำ/โลหะ ===
-      { id: 95, symbol: "GOLD", name: "Gold (XAU/USD) ออนซ์", type: "METAL", priceUsd: 2350, owned: 0, avgPrice: 0, change: 0 },
-      { id: 96, symbol: "SILVER", name: "Silver (XAG/USD) ออนซ์", type: "METAL", priceUsd: 28, owned: 0, avgPrice: 0, change: 0 },
-      { id: 97, symbol: "PLAT", name: "Platinum ทองคำขาว ออนซ์", type: "METAL", priceUsd: 960, owned: 0, avgPrice: 0, change: 0 },
-      { id: 98, symbol: "PALL", name: "Palladium พัลลาเดียม ออนซ์", type: "METAL", priceUsd: 1020, owned: 0, avgPrice: 0, change: 0 },
+      { id: 95, symbol: "GOLD", name: "Gold (XAU/USD)", type: "METAL", priceUsd: 2350, owned: 0, avgPrice: 0, change: 0 },
+      { id: 96, symbol: "SILVER", name: "Silver (XAG/USD)", type: "METAL", priceUsd: 28, owned: 0, avgPrice: 0, change: 0 },
+      { id: 97, symbol: "PLAT", name: "Platinum ทองคำขาว", type: "METAL", priceUsd: 960, owned: 0, avgPrice: 0, change: 0 },
+      { id: 98, symbol: "PALL", name: "Palladium พัลลาเดียม", type: "METAL", priceUsd: 1020, owned: 0, avgPrice: 0, change: 0 },
       { id: 99, symbol: "COPPER", name: "Copper ทองแดง", type: "METAL", priceUsd: 4.5, owned: 0, avgPrice: 0, change: 0 }
     ];
 
-    // กำหนดโครงสร้างคุณสมบัติความผันผวนและแนวโน้มจริงของหุ้นรายตัวและทองคำ
+    // โครงสร้างค่าความผันผวนของหุ้นย่อยที่อิงตลาดจริง
     const assetBehaviors = {
       "NVDA": { volt: 0.045, trend: 0.0015 },
       "TSLA": { volt: 0.040, trend: 0.0010 },
@@ -236,42 +264,16 @@
 
     function updateDashboard() {
       let currentPortfolioValueUsd = 0;
-      let totalCostBasisUsd = 0; // ยอดรวมทุนทั้งหมดที่ใช้ซื้อไป
-
-      assets.forEach(a => { 
-        currentPortfolioValueUsd += a.owned * a.priceUsd; 
-        totalCostBasisUsd += a.owned * a.avgPrice;
-      });
-      
+      assets.forEach(a => { currentPortfolioValueUsd += a.owned * a.priceUsd; });
       netWorthUsd = cashUsd + currentPortfolioValueUsd;
 
-      // คำนวณกำไร/ขาดทุนรวมของพอร์ต
-      let totalPnlUsd = currentPortfolioValueUsd - totalCostBasisUsd;
-      let totalPnlPercent = totalCostBasisUsd > 0 ? (totalPnlUsd / totalCostBasisUsd) * 100 : 0;
-
-      // แสดงผล Dashboard
       document.getElementById('display-cash-usd').innerText = "$" + Math.floor(cashUsd).toLocaleString();
       document.getElementById('display-networth-usd').innerText = "$" + Math.floor(netWorthUsd).toLocaleString();
       document.getElementById('display-cash-thb').innerText = "≈ " + Math.floor(cashUsd * FX_RATE).toLocaleString() + " บาท";
       document.getElementById('display-networth-thb').innerText = "≈ " + Math.floor(netWorthUsd * FX_RATE).toLocaleString() + " บาท";
 
-      // อัปเดตข้อมูลกล่อง Total P&L
-      const pnlUsdEl = document.getElementById('display-total-pnl-usd');
-      const pnlPercentEl = document.getElementById('display-total-pnl-percent');
-
-      pnlUsdEl.innerText = (totalPnlUsd >= 0 ? "+$" : "-$") + Math.abs(Math.floor(totalPnlUsd)).toLocaleString();
-      pnlPercentEl.innerText = (totalPnlUsd >= 0 ? "+" : "") + totalPnlPercent.toFixed(2) + "%";
-
-      if (totalPnlUsd > 0) {
-        pnlUsdEl.className = "text-2xl font-black mt-1 text-emerald-600";
-        pnlPercentEl.className = "text-xs text-emerald-600 font-bold";
-      } else if (totalPnlUsd < 0) {
-        pnlUsdEl.className = "text-2xl font-black mt-1 text-rose-500";
-        pnlPercentEl.className = "text-xs text-rose-500 font-bold";
-      } else {
-        pnlUsdEl.className = "text-2xl font-black mt-1 text-slate-500";
-        pnlPercentEl.className = "text-xs text-slate-500";
-      }
+      // อัปเดตฝั่งแถบพอร์ตโฟลิโอส่วนตัวทางขวา
+      renderPortfolio();
     }
 
     function renderTable() {
@@ -281,7 +283,6 @@
       assets.forEach(a => {
         if (currentFilter !== 'ALL' && a.type !== currentFilter) return;
 
-        // คำนวณ % การเปลี่ยนแปลง 24 ชม
         let changeText = "คงที่";
         let changeClass = "text-slate-500";
         if (a.change > 0) {
@@ -292,60 +293,16 @@
           changeClass = "text-rose-500 font-bold";
         }
 
-        // คำนวณกำไรขาดทุนรายสินทรัพย์ (Unrealized P&L)
-        let pnlText = "-";
-        let pnlClass = "text-slate-400";
-        if (a.owned > 0) {
-          let singlePnlUsd = a.priceUsd - a.avgPrice;
-          let totalPnlUsd = singlePnlUsd * a.owned;
-          let pnlPercent = (singlePnlUsd / a.avgPrice) * 100;
-          let totalPnlThb = totalPnlUsd * FX_RATE;
-
-          let sign = totalPnlUsd >= 0 ? "+" : "";
-          pnlText = `
-            <div class="font-bold">${sign}$${totalPnlUsd.toLocaleString(undefined, {maximumFractionDigits: 2})}</div>
-            <div class="text-xs">${sign}${pnlPercent.toFixed(2)}%</div>
-            <div class="text-[10px] opacity-80">${sign}฿${totalPnlThb.toLocaleString(undefined, {maximumFractionDigits: 0})}</div>
-          `;
-          pnlClass = totalPnlUsd >= 0 ? "text-emerald-600 font-semibold" : "text-rose-500 font-semibold";
-        }
-
-        // แสดงผลราคาปัจจุบัน
-        let priceThb = a.priceUsd * FX_RATE;
         let fixedUsd = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
-        let fixedThb = priceThb < 0.1 ? priceThb.toFixed(4) : priceThb.toLocaleString(undefined, {maximumFractionDigits:2});
-
-        // ต้นทุนเฉลี่ย
-        let avgPriceText = "-";
-        if (a.owned > 0) {
-          let avgThb = a.avgPrice * FX_RATE;
-          let fixedAvgUsd = a.avgPrice < 0.1 ? a.avgPrice.toFixed(5) : a.avgPrice.toLocaleString(undefined, {maximumFractionDigits:2});
-          let fixedAvgThb = avgThb < 0.1 ? avgThb.toFixed(4) : avgThb.toLocaleString(undefined, {maximumFractionDigits:2});
-          avgPriceText = `
-            <div class="text-[#776e65] font-semibold">Avg: $${fixedAvgUsd}</div>
-            <div class="text-[11px] text-[#9e948a]">฿${fixedAvgThb}</div>
-          `;
-        }
 
         let row = `
           <tr class="hover:bg-[#fbf8f3] transition">
             <td class="p-4">
               <span class="font-black text-[#f59563] block">${a.symbol}</span>
-              <span class="text-xs text-[#9e948a]">${a.name}</span>
+              <span class="text-xs text-[#9e948a] line-clamp-1">${a.name}</span>
             </td>
-            <td class="p-4 text-xs font-bold text-[#9e948a] uppercase">${a.type}</td>
-            <td class="p-4 text-right font-mono text-[#776e65]">
-              <div class="font-bold">$${fixedUsd}</div>
-              <div class="text-xs text-[#9e948a]">฿${fixedThb}</div>
-            </td>
-            <td class="p-4 text-right font-mono ${changeClass}">${changeText}</td>
-            <td class="p-4 text-right font-mono">
-              <div class="font-black text-lg text-[#f2b179]">${a.owned}</div>
-              <div class="text-xs mt-0.5">${avgPriceText}</div>
-            </td>
-            <td class="p-4 text-right font-mono ${pnlClass}">
-              ${pnlText}
-            </td>
+            <td class="p-4 text-right font-mono font-bold text-[#776e65]">$${fixedUsd}</td>
+            <td class="p-4 text-right font-mono ${changeClass} text-xs">${changeText}</td>
             <td class="p-4 text-center">
               <div class="flex gap-1 justify-center">
                 <button onclick="trade(${a.id}, 'BUY', 1)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2 py-1 rounded font-bold transition">ซื้อ 1</button>
@@ -360,6 +317,85 @@
       });
     }
 
+    // ฟังก์ชันใหม่: แสดงรายการพอร์ตโฟลิโอส่วนบุคคลทางขวา
+    function renderPortfolio() {
+      const portList = document.getElementById('portfolio-list');
+      const ownedAssets = assets.filter(a => a.owned > 0);
+      
+      document.getElementById('portfolio-count').innerText = ownedAssets.length;
+
+      if (ownedAssets.length === 0) {
+        portList.innerHTML = `
+          <div class="text-center py-8 text-[#9e948a] text-sm">
+            📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อเพื่อดูต้นทุนเฉลี่ยและกำไรสะสม
+          </div>
+        `;
+        document.getElementById('port-total-assets-usd').innerText = "$0";
+        document.getElementById('port-total-pl').innerText = "+$0 (0.00%)";
+        document.getElementById('port-total-pl').className = "text-slate-500 font-bold";
+        return;
+      }
+
+      let totalPortValue = 0;
+      let totalCostOfOwned = 0;
+      let html = '';
+
+      ownedAssets.forEach(a => {
+        let currentVal = a.owned * a.priceUsd;
+        let totalCost = a.owned * a.avgPrice;
+        let plUsd = currentVal - totalCost;
+        let plPercent = a.avgPrice > 0 ? (plUsd / totalCost) * 100 : 0;
+
+        totalPortValue += currentVal;
+        totalCostOfOwned += totalCost;
+
+        let plClass = "text-slate-500";
+        let plSign = "";
+        if (plUsd > 0.01) {
+          plClass = "text-emerald-600 font-bold";
+          plSign = "+";
+        } else if (plUsd < -0.01) {
+          plClass = "text-rose-500 font-bold";
+        }
+
+        let formatAvg = a.avgPrice < 0.1 ? a.avgPrice.toFixed(5) : a.avgPrice.toLocaleString(undefined, {maximumFractionDigits:2});
+        let formatPrice = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
+
+        html += `
+          <div class="bg-white border border-[#e5dbd0] p-3 rounded-xl flex flex-col gap-1 shadow-sm hover:border-[#f2b179] transition">
+            <div class="flex justify-between items-center">
+              <span class="font-black text-[#776e65] text-base">${a.symbol} <span class="text-xs font-normal text-[#9e948a] ml-1">x${a.owned}</span></span>
+              <span class="text-xs px-2 py-0.5 rounded font-bold uppercase ${a.type === 'ETF' ? 'bg-blue-100 text-blue-700' : a.type === 'STOCK' ? 'bg-orange-100 text-orange-700' : a.type === 'CRYPTO' ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700'}">${a.type}</span>
+            </div>
+            
+            <div class="grid grid-cols-2 text-xs text-[#9e948a] pt-1 border-t border-[#faf8ef]">
+              <div>เฉลี่ย (Avg): <span class="font-mono text-[#776e65] font-bold">$${formatAvg}</span></div>
+              <div class="text-right">ตลาด (Price): <span class="font-mono text-[#776e65] font-bold">$${formatPrice}</span></div>
+            </div>
+
+            <div class="flex justify-between items-center pt-1 border-t border-[#faf8ef] text-xs">
+              <span class="text-[#9e948a]">รวมมูลค่า: <span class="font-mono font-bold text-[#776e65]">$${currentVal.toLocaleString(undefined, {maximumFractionDigits:2})}</span></span>
+              <span class="${plClass} font-mono">${plSign}$${plUsd.toLocaleString(undefined, {maximumFractionDigits:2})} (${plSign}${plPercent.toFixed(2)}%)</span>
+            </div>
+          </div>
+        `;
+      });
+
+      portList.innerHTML = html;
+      document.getElementById('port-total-assets-usd').innerText = "$" + totalPortValue.toLocaleString(undefined, {maximumFractionDigits:2});
+      
+      let overallPlUsd = totalPortValue - totalCostOfOwned;
+      let overallPlPercent = totalCostOfOwned > 0 ? (overallPlUsd / totalCostOfOwned) * 100 : 0;
+      let overallSign = overallPlUsd > 0.01 ? "+" : "";
+      
+      let overallClass = "text-slate-500 font-bold";
+      if (overallPlUsd > 0.01) overallClass = "text-emerald-600 font-bold";
+      else if (overallPlUsd < -0.01) overallClass = "text-rose-500 font-bold";
+
+      document.getElementById('port-total-pl').innerText = `${overallSign}$${overallPlUsd.toLocaleString(undefined, {maximumFractionDigits:2})} (${overallSign}${overallPlPercent.toFixed(2)}%)`;
+      document.getElementById('port-total-pl').className = overallClass;
+    }
+
     function trade(id, action, quantity) {
       let asset = assets[id];
       let totalCostUsd = asset.priceUsd * quantity;
@@ -368,62 +404,60 @@
         if (cashUsd >= totalCostUsd) {
           cashUsd -= totalCostUsd;
           
-          // คำนวณราคาเฉลี่ยใหม่ (Weighted Average Cost)
-          let currentTotalCostBasis = (asset.owned * asset.avgPrice) + totalCostUsd;
+          // 🔥 คำนวณราคาเฉลี่ยถ่วงน้ำหนักใหม่ (Weighted Average Cost)
+          let oldTotalCost = asset.owned * asset.avgPrice;
+          let newTotalCost = oldTotalCost + totalCostUsd;
           asset.owned += quantity;
-          asset.avgPrice = currentTotalCostBasis / asset.owned;
-
-          document.getElementById('display-status').innerText = `🛒 ซื้อ ${asset.symbol} จำนวน ${quantity} หน่วย สำเร็จ! (ต้นทุนเฉลี่ยปรับเป็น $${asset.avgPrice.toFixed(2)})`;
+          asset.avgPrice = newTotalCost / asset.owned;
+          
+          document.getElementById('display-status').innerText = `🛒 ซื้อสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ที่ราคา $${asset.priceUsd.toFixed(2)}`;
         } else {
           alert(`เงินสด USD ไม่พอซื้อ!`);
-          return;
         }
       } else if (action === 'SELL') {
         if (asset.owned >= quantity) {
           asset.owned -= quantity;
           cashUsd += totalCostUsd;
           
-          // หากขายไปจนหมดพอร์ต ให้เซ็ตต้นทุนเฉลี่ยเป็น 0
           if (asset.owned === 0) {
-            asset.avgPrice = 0;
+            asset.avgPrice = 0; // ล้างประวัติเฉลี่ยหากไม่ได้ถือครองแล้ว
           }
-          document.getElementById('display-status').innerText = `💸 ขาย ${asset.symbol} จำนวน ${quantity} หน่วย สำเร็จ!`;
+          document.getElementById('display-status').innerText = `💸 ขายสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ที่ราคา $${asset.priceUsd.toFixed(2)}`;
         } else {
           alert(`คุณมีสินทรัพย์ไม่พอขาย!`);
-          return;
         }
       }
       updateDashboard();
       renderTable();
     }
 
-    // ฟังก์ชันจำลองราคาตลาด
     function refreshPrices() {
       const btn = document.getElementById('btn-refresh');
       btn.disabled = true;
-      document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมจริง...";
+      document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมหุ้นและดัชนี ETF จริง...";
 
       setTimeout(() => {
-        // 1. สุ่มปรับราคาหุ้น (STOCK) และโลหะ (METAL) ตามแนวโน้มเสมือนจริง
+        // ขั้นตอนที่ 1: สุ่มปรับราคาหุ้นรายตัว (STOCK) และ โลหะ (METAL) ตามแนวโน้มจริง
         assets.forEach(a => {
           if (a.type === 'STOCK' || a.type === 'METAL') {
             const config = assetBehaviors[a.symbol] || { volt: 0.015, trend: 0.0003 };
+            
             const randomShock = (Math.random() * 2 - 1) * config.volt;
             const changePercent = config.trend + randomShock;
 
             a.change = changePercent;
             a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
           }
-          // 2. คริปโต (CRYPTO) สุ่มอิสระและผันผวนสูงมาก
+          // ขั้นตอนที่ 2: คริปโต สุ่มอิสระและผันผวนสูงมาก
           else if (a.type === 'CRYPTO') {
             const cryptoVolt = 0.06; 
-            const changePercent = (Math.random() * 2 - 1.01) * cryptoVolt; 
+            const changePercent = (Math.random() * 2 - 1.02) * cryptoVolt; 
             a.change = changePercent;
             a.priceUsd = Math.max(0.00001, a.priceUsd * (1 + changePercent));
           }
         });
 
-        // 3. คำนวณราคา ETF โดยผูกน้ำหนักดัชนีจริงกับหุ้นในพอร์ต
+        // ขั้นตอนที่ 3: คำนวณราคา ETF เชื่อมจากหุ้นย่อยที่อ้างอิงจริง
         const getGrowth = (symbol) => {
           const item = assets.find(x => x.symbol === symbol);
           return item ? (item.priceUsd / (item.basePriceUsd || item.priceUsd)) : 1;
@@ -471,7 +505,7 @@
 
         let now = new Date();
         document.getElementById('display-time').innerText = now.toLocaleTimeString();
-        document.getElementById('display-status').innerText = "✅ คำนวณดัชนีราคาตลาดและคำนวณกำไร/ขาดทุนปัจจุบันเรียบร้อยแล้ว!";
+        document.getElementById('display-status').innerText = "✅ จำลองปรับเปลี่ยนราคาตลาดเสร็จสิ้น (พอร์ตของคุณอัปเดตราคาตลาดปัจจุบันแล้ว!)";
         updateDashboard();
         renderTable();
         btn.disabled = false;
@@ -483,9 +517,9 @@
       ['ALL', 'ETF', 'STOCK', 'CRYPTO', 'METAL'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (t === type) {
-          btn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-[#8f7a66] text-white";
+          btn.className = "px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-[#8f7a66] text-white whitespace-nowrap";
         } else {
-          btn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]";
+          btn.className = "px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap";
         }
       });
       renderTable();
