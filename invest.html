@@ -6,7 +6,6 @@
   <title>Global 100 Live Simulator 🏛️</title>
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <style>
-    /* แทรก Palette สีครีม-น้ำตาลมินิมอลเพิ่มเติมให้แมตช์กับธีมรวม */
     .theme-bg { background-color: #faf8ef; }
     .theme-card { background-color: #bbada0; }
     .theme-dark-card { background-color: #8f7a66; }
@@ -25,7 +24,7 @@
         </a>
         <div>
           <h1 class="text-2xl md:text-3xl font-black text-[#faf8ef] tracking-wide">🏛️ GLOBAL 100 LIVE SIMULATOR</h1>
-          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ต 100 สินทรัพย์ระดับโลก (คู่ขนาน USD / THB)</p>
+          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ตที่ราคาเชื่อมโยงตามตลาดจริง (ETF ผูกกับราคาหุ้นย่อย)</p>
         </div>
       </div>
       <div class="text-center bg-[#8f7a66] px-5 py-2 rounded-xl">
@@ -47,13 +46,13 @@
       </div>
       <div class="bg-white p-5 rounded-xl shadow-sm border border-[#e5dbd0] flex items-center">
         <button id="btn-refresh" onclick="refreshPrices()" class="w-full bg-[#f2b179] hover:bg-[#e59b5d] text-white font-black text-lg py-3 rounded-xl shadow transition transform active:scale-95">
-          🔄 อัปเดตราคา ($ USD)
+          🔄 จำลองอัปเดตราคา ($ USD)
         </button>
       </div>
     </div>
 
     <div id="display-status" class="bg-[#bbada0]/10 border-l-4 border-[#f59563] p-4 rounded-r-xl text-[#776e65] font-medium text-sm">
-      📢 ดึงข้อมูลพอร์ตสำเร็จ! ทุนเริ่มต้นของคุณคือ $30,000 USD สามารถคลิกคำสั่ง ซื้อ/ขาย บนกระดานได้ทันที
+      📢 เปิดพอร์ตสำเร็จ! ทุนเริ่มต้นของคุณคือ $30,000 USD สามารถเลือกซื้อหุ้น ทองคำ หรือ ETF ที่คำนวณตามสัดส่วนจริงได้แล้ววันนี้
     </div>
 
     <div class="flex gap-2 border-b border-[#e5dbd0] pb-2 overflow-x-auto">
@@ -91,24 +90,24 @@
     let netWorthUsd = 30000;
     let currentFilter = 'ALL';
 
-    // รายชื่อสินทรัพย์ 100 ตัว
+    // รายชื่อสินทรัพย์ 100 ตัว โดยเก็บราคาเริ่มต้นจริง (Base Price) ไว้ด้วยเพื่อคำนวณอัตราเติบโตสุทธิ
     let assets = [
       // === ETF ===
-      { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", priceUsd: 520, owned: 0, change: 0 },
-      { id: 1, symbol: "QQQ", name: "Invesco QQQ Trust", type: "ETF", priceUsd: 440, owned: 0, change: 0 },
-      { id: 2, symbol: "DIA", name: "SPDR Dow Jones Industrial", type: "ETF", priceUsd: 390, owned: 0, change: 0 },
-      { id: 3, symbol: "IWM", name: "iShares Russell 2000 ETF", type: "ETF", priceUsd: 200, owned: 0, change: 0 },
-      { id: 4, symbol: "VTI", name: "Vanguard Total Stock Market", type: "ETF", priceUsd: 260, owned: 0, change: 0 },
-      { id: 5, symbol: "VXUS", name: "Vanguard Total International", type: "ETF", priceUsd: 60, owned: 0, change: 0 },
-      { id: 6, symbol: "EEM", name: "iShares MSCI Emerging Markets", type: "ETF", priceUsd: 42, owned: 0, change: 0 },
-      { id: 7, symbol: "VWO", name: "Vanguard FTSE Emerging Markets", type: "ETF", priceUsd: 45, owned: 0, change: 0 },
-      { id: 8, symbol: "VGK", name: "Vanguard FTSE Europe ETF", type: "ETF", priceUsd: 68, owned: 0, change: 0 },
-      { id: 9, symbol: "ARKK", name: "ARK Innovation ETF", type: "ETF", priceUsd: 48, owned: 0, change: 0 },
-      { id: 10, symbol: "XLK", name: "Technology Select Sector SPDR", type: "ETF", priceUsd: 210, owned: 0, change: 0 },
-      { id: 11, symbol: "XLV", name: "Health Care Select Sector SPDR", type: "ETF", priceUsd: 145, owned: 0, change: 0 },
-      { id: 12, symbol: "XLF", name: "Financial Select Sector SPDR", type: "ETF", priceUsd: 40, owned: 0, change: 0 },
-      { id: 13, symbol: "VNQ", name: "Vanguard Real Estate ETF", type: "ETF", priceUsd: 85, owned: 0, change: 0 },
-      { id: 14, symbol: "VT", name: "Vanguard Total World Stock", type: "ETF", priceUsd: 110, owned: 0, change: 0 },
+      { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", basePriceUsd: 520, priceUsd: 520, owned: 0, change: 0 },
+      { id: 1, symbol: "QQQ", name: "Invesco QQQ Trust", type: "ETF", basePriceUsd: 440, priceUsd: 440, owned: 0, change: 0 },
+      { id: 2, symbol: "DIA", name: "SPDR Dow Jones Industrial", type: "ETF", basePriceUsd: 390, priceUsd: 390, owned: 0, change: 0 },
+      { id: 3, symbol: "IWM", name: "iShares Russell 2000 ETF", type: "ETF", basePriceUsd: 200, priceUsd: 200, owned: 0, change: 0 },
+      { id: 4, symbol: "VTI", name: "Vanguard Total Stock Market", type: "ETF", basePriceUsd: 260, priceUsd: 260, owned: 0, change: 0 },
+      { id: 5, symbol: "VXUS", name: "Vanguard Total International", type: "ETF", basePriceUsd: 60, priceUsd: 60, owned: 0, change: 0 },
+      { id: 6, symbol: "EEM", name: "iShares MSCI Emerging Markets", type: "ETF", basePriceUsd: 42, priceUsd: 42, owned: 0, change: 0 },
+      { id: 7, symbol: "VWO", name: "Vanguard FTSE Emerging Markets", type: "ETF", basePriceUsd: 45, priceUsd: 45, owned: 0, change: 0 },
+      { id: 8, symbol: "VGK", name: "Vanguard FTSE Europe ETF", type: "ETF", basePriceUsd: 68, priceUsd: 68, owned: 0, change: 0 },
+      { id: 9, symbol: "ARKK", name: "ARK Innovation ETF", type: "ETF", basePriceUsd: 48, priceUsd: 48, owned: 0, change: 0 },
+      { id: 10, symbol: "XLK", name: "Technology Select Sector SPDR", type: "ETF", basePriceUsd: 210, priceUsd: 210, owned: 0, change: 0 },
+      { id: 11, symbol: "XLV", name: "Health Care Select Sector SPDR", type: "ETF", basePriceUsd: 145, priceUsd: 145, owned: 0, change: 0 },
+      { id: 12, symbol: "XLF", name: "Financial Select Sector SPDR", type: "ETF", basePriceUsd: 40, priceUsd: 40, owned: 0, change: 0 },
+      { id: 13, symbol: "VNQ", name: "Vanguard Real Estate ETF", type: "ETF", basePriceUsd: 85, priceUsd: 85, owned: 0, change: 0 },
+      { id: 14, symbol: "VT", name: "Vanguard Total World Stock", type: "ETF", basePriceUsd: 110, priceUsd: 110, owned: 0, change: 0 },
 
       // === หุ้นรายตัว ===
       { id: 15, symbol: "AAPL", name: "Apple Inc.", type: "STOCK", priceUsd: 185, owned: 0, change: 0 },
@@ -202,16 +201,44 @@
       { id: 99, symbol: "COPPER", name: "Copper ทองแดง", type: "METAL", priceUsd: 4.5, owned: 0, change: 0 }
     ];
 
+    // กำหนดโครงสร้างคุณสมบัติความผันผวนและแนวโน้มจริงของหุ้นรายตัวและทองคำ
+    const assetBehaviors = {
+      // หุ้นเติบโตเทคโนโลยี (ผันผวนสูงมาก บวกแรงลบแรง)
+      "NVDA": { volt: 0.045, trend: 0.0015 },
+      "TSLA": { volt: 0.040, trend: 0.0010 },
+      "AMD": { volt: 0.035, trend: 0.0008 },
+      "AVGO": { volt: 0.030, trend: 0.0007 },
+      "ASML": { volt: 0.028, trend: 0.0006 },
+      // หุ้นบิ๊กเทค (ผันผวนกลาง เติบโตดี)
+      "AAPL": { volt: 0.018, trend: 0.0005 },
+      "MSFT": { volt: 0.016, trend: 0.0005 },
+      "AMZN": { volt: 0.020, trend: 0.0006 },
+      "GOOGL": { volt: 0.019, trend: 0.0004 },
+      "META": { volt: 0.025, trend: 0.0007 },
+      "NFLX": { volt: 0.026, trend: 0.0005 },
+      // หุ้นดั้งเดิม/การเงิน/สุขภาพ (ผันผวนต่ำ ค่อยๆ ขยับตามดัชนีหลัก)
+      "BRK.B": { volt: 0.010, trend: 0.0003 },
+      "JPM": { volt: 0.014, trend: 0.0003 },
+      "V": { volt: 0.012, trend: 0.0004 },
+      "KO": { volt: 0.008, trend: 0.0002 },
+      "PEP": { volt: 0.009, trend: 0.0002 },
+      "PG": { volt: 0.008, trend: 0.0002 },
+      "JNJ": { volt: 0.007, trend: 0.0001 },
+      "WMT": { volt: 0.011, trend: 0.0003 },
+      "UNH": { volt: 0.012, trend: 0.0002 },
+      // ทองคำและโลหะมีค่า
+      "GOLD": { volt: 0.009, trend: 0.0002 }, // ปลอดภัย เสถียรสูง
+      "SILVER": { volt: 0.018, trend: 0.0003 },
+      "PLAT": { volt: 0.014, trend: 0.0001 }
+    };
+
     function updateDashboard() {
       let currentPortfolioValueUsd = 0;
       assets.forEach(a => { currentPortfolioValueUsd += a.owned * a.priceUsd; });
       netWorthUsd = cashUsd + currentPortfolioValueUsd;
 
-      // แสดงผลฝั่ง USD
       document.getElementById('display-cash-usd').innerText = "$" + Math.floor(cashUsd).toLocaleString();
       document.getElementById('display-networth-usd').innerText = "$" + Math.floor(netWorthUsd).toLocaleString();
-      
-      // แสดงผลฝั่ง THB บาท
       document.getElementById('display-cash-thb').innerText = "≈ " + Math.floor(cashUsd * FX_RATE).toLocaleString() + " บาท";
       document.getElementById('display-networth-thb').innerText = "≈ " + Math.floor(netWorthUsd * FX_RATE).toLocaleString() + " บาท";
     }
@@ -234,8 +261,8 @@
         }
 
         let priceThb = a.priceUsd * FX_RATE;
-        let fixedUsd = a.priceUsd < 1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
-        let fixedThb = priceThb < 1 ? priceThb.toFixed(4) : priceThb.toLocaleString(undefined, {maximumFractionDigits:2});
+        let fixedUsd = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
+        let fixedThb = priceThb < 0.1 ? priceThb.toFixed(4) : priceThb.toLocaleString(undefined, {maximumFractionDigits:2});
 
         let row = `
           <tr class="hover:bg-[#fbf8f3] transition">
@@ -287,39 +314,93 @@
       renderTable();
     }
 
-    // ฟังก์ชันอัปเดตราคา เพื่อรองรับทั้งการรันผ่าน Google App Script และการรันแบบ Standalone บนหน้าเว็บตรงๆ
+    // ฟังก์ชันคำนวณและดึงข้อมูลอัตราราคาของสินทรัพย์แต่ละตัวตามพฤติกรรมในชีวิตจริง
     function refreshPrices() {
       const btn = document.getElementById('btn-refresh');
       btn.disabled = true;
-      document.getElementById('display-status').innerText = "⏳ อัปเดตราคาตลาดในระบบ...";
+      document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมหุ้นและดัชนี ETF จริง...";
 
-      // เช็คว่ามี API ของ Google Apps Script หรือไม่
-      if (typeof google !== 'undefined' && google.script && google.script.run) {
-        google.script.run.withSuccessHandler(function(updatedAssets) {
-          assets = updatedAssets;
-          let now = new Date();
-          document.getElementById('display-time').innerText = now.toLocaleTimeString();
-          document.getElementById('display-status').innerText = "✅ อัปเดตราคาตลาดคู่ขนาน (USD/THB) จากเซิร์ฟเวอร์สำเร็จ!";
-          updateDashboard();
-          renderTable();
-          btn.disabled = false;
-        }).fetchLivePrices(assets);
-      } else {
-        // หากเล่นบน Local หรือ GitHub Pages ตรงๆ ให้จำลองความผันผวนของราคา (Randomize)
-        setTimeout(() => {
-          assets.forEach(a => {
-            let changePercent = (Math.random() * 10 - 5) / 100; // สุ่มผันผวน -5% ถึง +5%
+      setTimeout(() => {
+        // ขั้นตอนที่ 1: สุ่มปรับราคาหุ้นรายตัว (STOCK) และ โลหะ (METAL) ตามอัตลักษณ์พฤติกรรมจริง
+        assets.forEach(a => {
+          if (a.type === 'STOCK' || a.type === 'METAL') {
+            const config = assetBehaviors[a.symbol] || { volt: 0.015, trend: 0.0003 }; // ค่าเริ่มต้นหากไม่ระบุ
+            
+            // ใช้เทคนิคสุ่มสไตล์ Brownian Motion (มีแรงสะสม Trend + ค่าผันผวนจำลองจริง)
+            const randomShock = (Math.random() * 2 - 1) * config.volt;
+            const changePercent = config.trend + randomShock;
+
+            a.change = changePercent;
+            a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
+          }
+          // ขั้นตอนที่ 2: สำหรับ CRYPTO สุ่มสวิงแรงตามคำขอของผู้ใช้ (สุ่มอิสระ)
+          else if (a.type === 'CRYPTO') {
+            const cryptoVolt = 0.06; // ความผันผวนสูงมาก
+            const changePercent = (Math.random() * 2 - 1.02) * cryptoVolt; // มีแนวโน้มย้อยลงนิดหน่อยเฉลี่ยสะท้อนความเสี่ยงคริปโต
             a.change = changePercent;
             a.priceUsd = Math.max(0.00001, a.priceUsd * (1 + changePercent));
-          });
-          let now = new Date();
-          document.getElementById('display-time').innerText = now.toLocaleTimeString();
-          document.getElementById('display-status').innerText = "✅ จำลองอัปเดตราคาตลาดคู่ขนาน (USD/THB) สำเร็จ!";
-          updateDashboard();
-          renderTable();
-          btn.disabled = false;
-        }, 800);
-      }
+          }
+        });
+
+        // ขั้นตอนที่ 3: คำนวณราคา ETF โดยเชื่อมโยงมาจากหุ้นย่อยที่อ้างอิงจริงในตลาดหุ้น
+        const getGrowth = (symbol) => {
+          const item = assets.find(x => x.symbol === symbol);
+          return item ? (item.priceUsd / (item.basePriceUsd || item.priceUsd)) : 1;
+        };
+
+        assets.forEach(a => {
+          if (a.type === 'ETF') {
+            let trackedGrowth = 1;
+
+            if (a.symbol === "SPY") {
+              // ดัชนี S&P 500 (กระจายสัดส่วนตามหุ้นยักษ์ใหญ่คละกลุ่ม)
+              trackedGrowth = (
+                getGrowth("MSFT") * 0.15 + getGrowth("AAPL") * 0.14 + getGrowth("NVDA") * 0.12 +
+                getGrowth("AMZN") * 0.10 + getGrowth("GOOGL") * 0.09 + getGrowth("META") * 0.08 +
+                getGrowth("BRK.B") * 0.08 + getGrowth("JPM") * 0.08 + getGrowth("V") * 0.08 + getGrowth("UNH") * 0.08
+              );
+            } else if (a.symbol === "QQQ") {
+              // ดัชนี Nasdaq 100 (เน้นกลุ่มเทคโนโลยี Big Tech 7 นางฟ้า)
+              trackedGrowth = (
+                getGrowth("AAPL") * 0.20 + getGrowth("MSFT") * 0.20 + getGrowth("NVDA") * 0.18 +
+                getGrowth("AMZN") * 0.13 + getGrowth("GOOGL") * 0.11 + getGrowth("META") * 0.11 + getGrowth("TSLA") * 0.07
+              );
+            } else if (a.symbol === "DIA") {
+              // ดัชนี Dow Jones (เน้นหุ้นปลอดภัยและหุ้นสถาบันการเงินการค้า)
+              trackedGrowth = (
+                getGrowth("UNH") * 0.15 + getGrowth("MSFT") * 0.15 + getGrowth("HD") * 0.10 +
+                getGrowth("MCD") * 0.10 + getGrowth("CRM") * 0.10 + getGrowth("V") * 0.10 +
+                getGrowth("JPM") * 0.10 + getGrowth("KO") * 0.10 + getGrowth("PG") * 0.10
+              );
+            } else if (a.symbol === "XLK") {
+              // กองทุนเทคโนโลยีสหรัฐฯ โดยตรง
+              trackedGrowth = (
+                getGrowth("MSFT") * 0.22 + getGrowth("AAPL") * 0.20 + getGrowth("NVDA") * 0.20 +
+                getGrowth("AVGO") * 0.10 + getGrowth("CRM") * 0.08 + getGrowth("ADBE") * 0.07 +
+                getGrowth("AMD") * 0.05 + getGrowth("INTC") * 0.04 + getGrowth("ORCL") * 0.04
+              );
+            } else {
+              // ETF อื่นๆ (เฉลี่ยราคาตามความเติบโตภาพรวมของหุ้นในบอร์ด)
+              const avgStockGrowth = assets
+                .filter(x => x.type === 'STOCK')
+                .reduce((acc, curr) => acc + (curr.priceUsd / curr.priceUsd), 0) / 50;
+              trackedGrowth = avgStockGrowth;
+            }
+
+            // อัปเดตราคาและเปอร์เซ็นต์การเปลี่ยนแปลงจริง
+            const prevPrice = a.priceUsd;
+            a.priceUsd = a.basePriceUsd * trackedGrowth;
+            a.change = (a.priceUsd - prevPrice) / prevPrice;
+          }
+        });
+
+        let now = new Date();
+        document.getElementById('display-time').innerText = now.toLocaleTimeString();
+        document.getElementById('display-status').innerText = "✅ อัปเดตราคาตลาดคู่ขนาน (ETF ผูกราคาเชื่อมกับราคาหุ้นจริง) เรียบร้อยแล้ว!";
+        updateDashboard();
+        renderTable();
+        btn.disabled = false;
+      }, 1000);
     }
 
     function filterType(type) {
