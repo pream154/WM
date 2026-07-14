@@ -3,69 +3,207 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>My Web Portal 🚀</title>
+  <title>My Developer Workspace 🚀</title>
   <style>
+    /* ตั้งค่าพื้นฐานและการคุมโทนสีมินิมอล (ครีม-น้ำตาล-เทา) */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background-color: #faf8ef;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      min-height: 100vh;
       color: #776e65;
-    }
-    .portal-container {
-      background: white;
-      padding: 40px;
-      border-radius: 16px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-      text-align: center;
-      max-width: 450px;
-      width: 100%;
-    }
-    h1 {
-      margin-bottom: 10px;
-      font-size: 2.2rem;
-    }
-    p {
-      color: #9e948a;
-      margin-bottom: 30px;
-    }
-    .links-list {
+      margin: 0;
+      padding: 0;
       display: flex;
       flex-direction: column;
-      gap: 15px;
+      min-height: 100vh;
     }
-    /* สไตล์ของปุ่มลิงก์ */
-    .project-link {
+
+    /* ส่วนหัวของเว็บ (Header) ให้ดูมีมิติระดับมาตรฐาน */
+    header {
+      background-color: #bbada0;
+      color: white;
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.5rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      margin: 10px 0 0 0;
+      color: #fbf8f3;
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+
+    /* กล่องข้อความต้อนรับส่วนกลาง */
+    .hero-section {
+      max-width: 900px;
+      margin: 40px auto 20px auto;
+      padding: 0 20px;
+      text-align: center;
+    }
+
+    .hero-section h2 {
+      font-size: 1.8rem;
+      color: #776e65;
+      margin-bottom: 10px;
+    }
+
+    .hero-section p {
+      color: #9e948a;
+      font-size: 1rem;
+      margin: 0;
+    }
+
+    /* ระบบ Grid สำหรับจัดวางการ์ดโปรเจกต์ (ปรับขนาดตามหน้าจออัตโนมัติ) */
+    .main-container {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto cubic-bezier(0.4, 0, 0.2, 1);
+      padding: 20px;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 25px;
+      flex: 1; /* ดัน Footer ให้จมลงข้างล่าง */
+    }
+
+    /* รูปแบบของการ์ดแต่ละโปรเจกต์ (Card Design) */
+    .project-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+      border: 1px solid #e5dbd0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* เอฟเฟกต์ยกตัวและเพิ่มเงาเวลาเมาส์ชี้ ให้ดูพรีเมียม */
+    .project-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 20px rgba(119, 110, 101, 0.1);
+      border-color: #bbada0;
+    }
+
+    /* ตกแต่งด้านในตัวการ์ด */
+    .card-icon {
+      font-size: 2.5rem;
+      margin-bottom: 15px;
+    }
+
+    .card-title {
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #776e65;
+      margin: 0 0 10px 0;
+    }
+
+    .card-description {
+      font-size: 0.95rem;
+      color: #9e948a;
+      line-height: 1.5;
+      margin: 0 0 25px 0;
+      flex-grow: 1; /* ยืดข้อความให้ปุ่มอยู่เท่ากัน */
+    }
+
+    /* ปุ่มกดเปิดแอปพลิเคชัน */
+    .btn-launch {
       background-color: #8f7a66;
       color: white;
       text-decoration: none;
-      padding: 15px 20px;
-      border-radius: 8px;
-      font-size: 1.1rem;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-size: 1rem;
       font-weight: bold;
-      transition: all 0.2s ease;
-      display: block;
+      text-align: center;
+      transition: background-color 0.2s;
     }
-    .project-link:hover {
+
+    .btn-launch:hover {
       background-color: #7f6a56;
-      transform: translateY(-2px);
+    }
+
+    /* แท็กบอกสถานะโปรเจกต์ */
+    .status-tag {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background-color: #f2b179;
+      color: white;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+
+    .status-tag.active {
+      background-color: #f59563;
+    }
+
+    /* แถบด้านล่างสุดของเว็บ (Footer) */
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #9e948a;
+      font-size: 0.85rem;
+      background-color: #fbf8f3;
+      border-top: 1px solid #e5dbd0;
+      margin-top: 40px;
     }
   </style>
 </head>
 <body>
 
-<div class="portal-container">
-  <h1>My Workspace 🚀</h1>
-  <p>ยินดีต้อนรับเข้าสู่หน้าแรกของฉัน เลือกเปิดโปรเจกต์ด้านล่างนี้ได้เลยครับ:</p>
+  <header>
+    <h1>MY WEB WORKSPACE</h1>
+    <p>ศูนย์รวมมินิเกมและเว็บแอปพลิเคชันส่วนตัว</p>
+  </header>
 
-  <div class="links-list">
-    <a href="mathmerge.html" class="project-link">🎯 เล่นเกม Math Merge</a>
-    <a href="blackjack.html" class="project-link" style="background-color: #2c3e50;">🃏 เล่นเกม Blackjack</a>
+  <section class="hero-section">
+    <h2>คลังโปรเจกต์ (Project Hub)</h2>
+    <p>ยินดีต้อนรับเข้าสู่พอร์ตโฟลิโอแอปพลิเคชันที่พัฒนาด้วย HTML, CSS และ JavaScript</p>
+  </section>
+
+  <main class="main-container">
+
+    <div class="project-card">
+      <div class="status-tag">Puzzle</div>
+      <div class="card-icon">🎯</div>
+      <h3 class="card-title">Math Merge</h3>
+      <p class="card-description">เกมปริศนาจับคู่คำนวณตัวเลข ขยับบล็อกเลื่อนตามอาเรย์เส้นทางเดินจริง (BFS Pathfinding) เพื่อยุบรวมคะแนนให้สูงที่สุดในสไตล์ 2048</p>
+      <a href="mathmerge.html" class="btn-launch">เปิดเล่นเกมตอนนี้ ➔</a>
     </div>
-</div>
+
+    <div class="project-card">
+      <div class="status-tag active">Card Game</div>
+      <div class="card-icon">🃏</div>
+      <h3 class="card-title">Blackjack Classic</h3>
+      <p class="card-description">เกมไพ่แบล็กแจ็กยอดนิยม วัดใจจั่วไพ่แข่งแต้มกับเจ้ามือคอมพิวเตอร์ผ่านดีไซน์มินิมอลคุมโทนสบายตาและระบบคำนวณแต้มไพ่ Ace อัตโนมัติ</p>
+      <a href="blackjack.html" class="btn-launch" style="background-color: #f59563;">เปิดเล่นเกมตอนนี้ ➔</a>
+    </div>
+
+    <div class="project-card" style="opacity: 0.6; border-style: dashed;">
+      <div class="card-icon" style="filter: grayscale(100%);">🚀</div>
+      <h3 class="card-title" style="color: #9e948a;">โปรเจกต์ถัดไป</h3>
+      <p class="card-description">อยู่ระหว่างการวางแผนสร้างสรรค์ระบบและฟังก์ชันใหม่ ๆ สามารถเข้ามาติดตามอัปเดตผลงานชิ้นต่อไปได้ที่นี่เร็ว ๆ นี้</p>
+      <a href="#" class="btn-launch" style="background-color: #bdc3c7; cursor: not-allowed; pointer-events: none;">Coming Soon</a>
+    </div>
+
+  </main>
+
+  <footer>
+    © 2026 Crafted by My Workspace. All Rights Reserved. Hosted via GitHub Pages.
+  </footer>
 
 </body>
 </html>
