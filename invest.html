@@ -432,82 +432,176 @@
   renderTable();
 }
 
-    function refreshPrices() {
+function refreshPrices() {
       const btn = document.getElementById('btn-refresh');
       btn.disabled = true;
-      document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมหุ้นและดัชนี ETF จริง...";
+      document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมหุ้นย่อยและคำนวณ NAV ของ ETF จริง...";
 
       setTimeout(() => {
+        // ขั้นตอนที่ 1: สุ่มปรับราคาเฉพาะ STOCK, CRYPTO และ METAL (สินทรัพย์ฐาน)
         assets.forEach(a => {
-          if (a.type === 'STOCK' || a.type === 'METAL') {
-            const config = assetBehaviors[a.symbol] || { volt: 0.015, trend: 0.0003 };
-            const randomShock = (Math.random() * 2 - 1) * config.volt;
-            const changePercent = config.trend + randomShock;
+          // 1. หุ้นเทคโนโลยีขนาดใหญ่ (Big Tech) - ผันผวนค่อนข้างสูง เติบโตดี
+          if (["NVDA", "AAPL", "MSFT", "AMZN", "GOOGL", "META", "AVGO", "AMD", "ASML"].includes(a.symbol)) {
+            const randomShock = (Math.random() * 2 - 1) * 0.035; // Volt 3.5%
+            const changePercent = 0.0012 + randomShock;          // Trend เติบโตบวกอ่อนๆ
             const oldPrice = a.priceUsd;
             a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
             a.change = (a.priceUsd - oldPrice) / oldPrice;
           }
+          // 2. หุ้นเติบโตสูง/เสี่ยงสูง (High Growth) เช่น TSLA, NFLX
+          else if (["TSLA", "NFLX", "UBER"].includes(a.symbol)) {
+            const randomShock = (Math.random() * 2 - 1) * 0.045; // Volt สูง 4.5%
+            const changePercent = 0.0008 + randomShock;
+            const oldPrice = a.priceUsd;
+            a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
+            a.change = (a.priceUsd - oldPrice) / oldPrice;
+          }
+          // 3. หุ้นคุณค่า/หุ้นปลอดภัย (Defensive & Value) - ผันผวนต่ำ เน้นปันผล 안정적
+          else if (["BRK.B", "JPM", "V", "KO", "PEP", "PG", "JNJ", "WMT", "UNH", "COST", "HD"].includes(a.symbol)) {
+            const randomShock = (Math.random() * 2 - 1) * 0.012; // Volt ต่ำมาก 1.2%
+            const changePercent = 0.0003 + randomShock;
+            const oldPrice = a.priceUsd;
+            a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
+            a.change = (a.priceUsd - oldPrice) / oldPrice;
+          }
+          // 4. หุ้น STOCK ตัวอื่นๆ ที่เหลือในระบบ (เซ็ตค่ากลางๆ)
+          else if (a.type === 'STOCK') {
+            const randomShock = (Math.random() * 2 - 1) * 0.020; 
+            const changePercent = 0.0005 + randomShock;
+            const oldPrice = a.priceUsd;
+            a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
+            a.change = (a.priceUsd - oldPrice) / oldPrice;
+          }
+          // 5. ฝั่งคริปโต (CRYPTO) - ซิ่งสุด ผันผวนโหดมาก
           else if (a.type === 'CRYPTO') {
-            const cryptoVolt = 0.06; 
+            const cryptoVolt = 0.065; 
             const changePercent = (Math.random() * 2 - 1.01) * cryptoVolt; 
             const oldPrice = a.priceUsd;
             a.priceUsd = Math.max(0.00001, a.priceUsd * (1 + changePercent));
             a.change = (a.priceUsd - oldPrice) / oldPrice;
           }
+          // 6. โลหะมีค่า (METAL) - สินทรัพย์ปลอดภัย ผันผวนต่ำตามทองคำโลก
+          else if (a.type === 'METAL') {
+            const metalVolt = a.symbol === "GOLD" ? 0.010 : 0.022; // ทองนิ่งกว่าเงิน
+            const changePercent = 0.0002 + (Math.random() * 2 - 1) * metalVolt;
+            const oldPrice = a.priceUsd;
+            a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
+            a.change = (a.priceUsd - oldPrice) / oldPrice;
+          }
         });
 
+        // ฟังก์ชันช่วยดึงสัดส่วนการเติบโต (Growth Ratio) ของหุ้นแต่ละตัว
         const getGrowth = (symbol) => {
           const item = assets.find(x => x.symbol === symbol);
           if (!item) return 1;
-          const initialPrice = item.basePriceUsd || 185; 
+          const initialPrice = item.basePriceUsd || 100; // ใช้ราคาฐานในการเทียบโต
           return item.priceUsd / initialPrice;
         };
 
+        // ขั้นตอนที่ 2: คำนวณราคา ETF จาก "ผลรวมน้ำหนักของหุ้นย่อยจริง" เท่านั้น ไม่มีการสุ่มเอง
+// ขั้นตอนที่ 2: คำนวณราคา ETF จาก "ผลรวมน้ำหนักของหุ้นย่อยจริง" 100% ครบทั้ง 15 ตัว
         assets.forEach(a => {
           if (a.type === 'ETF') {
             let trackedGrowth = 1;
 
+            // --- 1. กลุ่มดัชนีหลัก (Core Index ETFs) ---
             if (a.symbol === "SPY") {
+              // S&P 500: หุ้นใหญ่ 10 ตัวแรก
               trackedGrowth = (
                 getGrowth("MSFT") * 0.15 + getGrowth("AAPL") * 0.14 + getGrowth("NVDA") * 0.12 +
                 getGrowth("AMZN") * 0.10 + getGrowth("GOOGL") * 0.09 + getGrowth("META") * 0.08 +
                 getGrowth("BRK.B") * 0.08 + getGrowth("JPM") * 0.08 + getGrowth("V") * 0.08 + getGrowth("UNH") * 0.08
               );
             } else if (a.symbol === "QQQ") {
+              // Nasdaq 100: เน้น Tech & Growth
               trackedGrowth = (
                 getGrowth("AAPL") * 0.20 + getGrowth("MSFT") * 0.20 + getGrowth("NVDA") * 0.18 +
                 getGrowth("AMZN") * 0.13 + getGrowth("GOOGL") * 0.11 + getGrowth("META") * 0.11 + getGrowth("TSLA") * 0.07
               );
             } else if (a.symbol === "DIA") {
+              // Dow Jones: หุ้นอุตสาหกรรมดั้งเดิมและหุ้นคุณค่า
               trackedGrowth = (
                 getGrowth("UNH") * 0.15 + getGrowth("MSFT") * 0.15 + getGrowth("HD") * 0.10 +
                 getGrowth("MCD") * 0.10 + getGrowth("CRM") * 0.10 + getGrowth("V") * 0.10 +
                 getGrowth("JPM") * 0.10 + getGrowth("KO") * 0.10 + getGrowth("PG") * 0.10
               );
+            } else if (a.symbol === "IWM") {
+              // Russell 2000: หุ้นขนาดกลาง-เล็ก (สุ่มอิงจากหุ้นเติบโตแถวสองในระบบ)
+              trackedGrowth = (
+                getGrowth("AMD") * 0.25 + getGrowth("UBER") * 0.25 + getGrowth("CMG") * 0.25 + getGrowth("AAL") * 0.25
+              );
+            } else if (a.symbol === "VTI") {
+              // Total Stock Market: หุ้นทั้งตลาดสหรัฐฯ (เฉลี่ยหุ้นใหญ่ หุ้นกลาง หุ้นเล็ก ปันผล ผสมกัน)
+              trackedGrowth = (
+                getGrowth("SPY") * 0.70 + getGrowth("IWM") * 0.30
+              );
+            }
+
+            // --- 2. กลุ่มหุ้นต่างประเทศ / ตลาดเกิดใหม่ (International & Emerging Markets) ---
+            // *หมายเหตุ: เนื่องจากในลิสต์ไม่มีหุ้นนอกอเมริกาโดยตรง จึงผูกโยงกับหุ้น Global Value/Automotive/Semi ที่ส่งผลต่อตลาดโลก
+            else if (a.symbol === "VXUS") {
+              // Total International Stock (ตลาดโลกไม่รวมสหรัฐฯ: อิง ASML ยุโรป, TM ญี่ปุ่น, AIR บัส)
+              trackedGrowth = (
+                getGrowth("ASML") * 0.40 + getGrowth("TM") * 0.30 + getGrowth("AIR.PA") * 0.30
+              );
+            } else if (a.symbol === "EEM" || a.symbol === "VWO") {
+              // Emerging Markets: ตลาดเกิดใหม่ (ขับเคลื่อนด้วยเทคโนโลยี Supply Chain แบรนด์รถยนต์ และสินค้าโภคภัณฑ์)
+              trackedGrowth = (
+                getGrowth("TSLA") * 0.30 + getGrowth("AMD") * 0.30 + getGrowth("TM") * 0.20 + getGrowth("COPPER") * 0.20
+              );
+            } else if (a.symbol === "VGK") {
+              // FTSE Europe: เน้นคัดเฉพาะหุ้นฝั่งยุโรปที่มีในระบบ
+              trackedGrowth = (
+                getGrowth("ASML") * 0.50 + getGrowth("AIR.PA") * 0.50
+              );
+            }
+
+            // --- 3. กลุ่มเน้นนวัตกรรมและเซกเตอร์รายอุตสาหกรรม (Thematic & Sector ETFs) ---
+            else if (a.symbol === "ARKK") {
+              // ARK Innovation: หุ้นนวัตกรรมเปลี่ยนโลก (Disruptive Tech ผันผวนสูง ซิ่งแรง)
+              trackedGrowth = (
+                getGrowth("TSLA") * 0.35 + getGrowth("NVDA") * 0.25 + getGrowth("AMD") * 0.20 + getGrowth("UBER") * 0.20
+              );
             } else if (a.symbol === "XLK") {
+              // Technology Sector: กลุ่มเทคโนโลยีสารสนเทศแท้ๆ
               trackedGrowth = (
                 getGrowth("MSFT") * 0.22 + getGrowth("AAPL") * 0.20 + getGrowth("NVDA") * 0.20 +
                 getGrowth("AVGO") * 0.10 + getGrowth("CRM") * 0.08 + getGrowth("ADBE") * 0.07 +
                 getGrowth("AMD") * 0.05 + getGrowth("INTC") * 0.04 + getGrowth("ORCL") * 0.04
               );
-            } else {
-              const stocks = assets.filter(x => x.type === 'STOCK');
-              let sumGrowth = 0;
-              stocks.forEach(s => {
-                sumGrowth += (s.priceUsd / (s.basePriceUsd || 100));
-              });
-              trackedGrowth = sumGrowth / stocks.length;
+            } else if (a.symbol === "XLV") {
+              // Health Care Sector: กลุ่มการแพทย์ โรงพยาบาล และยารักษาโรค
+              trackedGrowth = (
+                getGrowth("LLY") * 0.40 + getGrowth("UNH") * 0.30 + getGrowth("JNJ") * 0.20 + getGrowth("PFE") * 0.10
+              );
+            } else if (a.symbol === "XLF") {
+              // Financial Sector: กลุ่มธนาคาร การเงิน และสถาบันการชำระเงิน
+              trackedGrowth = (
+                getGrowth("JPM") * 0.35 + getGrowth("BAC") * 0.25 + getGrowth("V") * 0.20 + getGrowth("MA") * 0.20
+              );
+            } else if (a.symbol === "VNQ") {
+              // Real Estate Sector: กลุ่มอสังหาริมทรัพย์และที่อยู่อาศัย (อิงหุ้นสร้างบ้าน หุ้นโมเดิร์นเทรด และวัสดุก่อสร้าง)
+              trackedGrowth = (
+                getGrowth("NVR") * 0.40 + getGrowth("HD") * 0.30 + getGrowth("COST") * 0.30
+              );
+            } else if (a.symbol === "VT") {
+              // Total World Stock: หุ้นรวมทั้งโลก (เอาตลาดอเมริกา 60% มารวมกับตลาดนอกอเมริกา 40%)
+              trackedGrowth = (
+                getGrowth("VTI") * 0.60 + getGrowth("VXUS") * 0.40
+              );
             }
 
+            // คำนวณราคาปัจจุบันตามการเปลี่ยนแปลงค่าน้ำหนักสะท้อนจริง
             const prevPrice = a.priceUsd;
             a.priceUsd = a.basePriceUsd * trackedGrowth;
             a.change = (a.priceUsd - prevPrice) / prevPrice;
           }
         });
 
+        // ขั้นตอนที่ 3: อัปเดต UI และข้อมูลพอร์ต
         let now = new Date();
         document.getElementById('display-time').innerText = now.toLocaleTimeString();
-        document.getElementById('display-status').innerText = "✅ จำลองปรับเปลี่ยนราคาตลาดเสร็จสิ้น (ราคา ETF อัปเดตผูกกับหุ้นย่อยเรียบร้อย)";
+        document.getElementById('display-status').innerText = "✅ ดัชนีตลาดปรับตัวเสร็จสิ้น! บิ๊กเทค หุ้นปันผล และ ETF ขยับสัมพันธ์กันอย่างถูกต้อง";
         updateDashboard();
         renderTable();
         btn.disabled = false;
