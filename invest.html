@@ -15,7 +15,7 @@
 </head>
 <body class="theme-bg text-[#776e65] min-h-screen p-4 md:p-8 font-sans">
 
-  <div class="max-w-7xl mx-auto flex flex-col gap-6">
+  <div class="max-w-6xl mx-auto flex flex-col gap-6">
     
     <div class="flex flex-col md:flex-row justify-between items-center bg-[#bbada0] text-white p-6 rounded-2xl shadow-md gap-4">
       <div class="flex items-center gap-4">
@@ -24,7 +24,7 @@
         </a>
         <div>
           <h1 class="text-2xl md:text-3xl font-black text-[#faf8ef] tracking-wide">🏛️ GLOBAL 100 LIVE SIMULATOR</h1>
-          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ตสมจริง (ตลาดอ้างอิงรายตัว + บัญชีคำนวณต้นทุนถัวเฉลี่ยและกำไรเรียลไทม์)</p>
+          <p class="text-[#fbf8f3] text-xs md:text-sm opacity-90">ระบบจำลองพอร์ตที่ราคาเชื่อมโยงตามตลาดจริง (ETF ผูกกับราคาหุ้นย่อย)</p>
         </div>
       </div>
       <div class="text-center bg-[#8f7a66] px-5 py-2 rounded-xl">
@@ -52,68 +52,34 @@
     </div>
 
     <div id="display-status" class="bg-[#bbada0]/10 border-l-4 border-[#f59563] p-4 rounded-r-xl text-[#776e65] font-medium text-sm">
-      📢 เปิดพอร์ตสำเร็จ! ทุนเริ่มต้นของคุณคือ $30,000 USD สามารถเลือกซื้อหุ้น ทองคำ หรือ ETF เพื่อรับการวิเคราะห์ผลตอบแทนได้ทันที
+      📢 เปิดพอร์ตสำเร็จ! ทุนเริ่มต้นของคุณคือ $30,000 USD สามารถเลือกซื้อหุ้น ทองคำ หรือ ETF ที่คำนวณตามสัดส่วนจริงได้แล้ววันนี้
     </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-      
-      <div class="lg:col-span-8 flex flex-col gap-4">
-        <div class="flex justify-between items-center border-b border-[#e5dbd0] pb-2">
-          <div class="flex gap-2 overflow-x-auto">
-            <button onclick="filterType('ALL')" id="tab-ALL" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-[#8f7a66] text-white whitespace-nowrap">ทั้งหมด (100)</button>
-            <button onclick="filterType('ETF')" id="tab-ETF" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">กองทุน ETF</button>
-            <button onclick="filterType('STOCK')" id="tab-STOCK" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">หุ้นรายตัว</button>
-            <button onclick="filterType('CRYPTO')" id="tab-CRYPTO" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">คริปโต/Coin</button>
-            <button onclick="filterType('METAL')" id="tab-METAL" class="px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap">ทอง/โลหะมีค่า</button>
-          </div>
-        </div>
+    <div class="flex gap-2 border-b border-[#e5dbd0] pb-2 overflow-x-auto">
+      <button onclick="filterType('ALL')" id="tab-ALL" class="px-4 py-2 text-sm font-bold rounded-lg bg-[#8f7a66] text-white">ทั้งหมด (100)</button>
+      <button onclick="filterType('ETF')" id="tab-ETF" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">กองทุน ETF</button>
+      <button onclick="filterType('STOCK')" id="tab-STOCK" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">หุ้นรายตัว</button>
+      <button onclick="filterType('CRYPTO')" id="tab-CRYPTO" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">คริปโต/Coin</button>
+      <button onclick="filterType('METAL')" id="tab-METAL" class="px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]">ทอง/โลหะมีค่า</button>
+    </div>
 
-        <div class="bg-white rounded-2xl border border-[#e5dbd0] overflow-hidden shadow-sm">
-          <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="bg-[#fbf8f3] text-[#9e948a] text-xs font-bold uppercase tracking-wider border-b border-[#e5dbd0]">
-                  <th class="p-4">สินทรัพย์</th>
-                  <th class="p-4 text-right">ราคาล่าสุด (USD)</th>
-                  <th class="p-4 text-right">เปลี่ยนแปลง</th>
-                  <th class="p-4 text-center">ส่งคำสั่งซื้อขาย (หน่วย)</th>
-                </tr>
-              </thead>
-              <tbody id="assets-tbody" class="divide-y divide-[#e5dbd0]/50 text-sm">
-                </tbody>
-            </table>
-          </div>
-        </div>
+    <div class="bg-white rounded-2xl border border-[#e5dbd0] overflow-hidden shadow-sm">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse">
+          <thead>
+            <tr class="bg-[#fbf8f3] text-[#9e948a] text-xs font-bold uppercase tracking-wider border-b border-[#e5dbd0]">
+              <th class="p-4">ชื่อย่อ / สินทรัพย์</th>
+              <th class="p-4">ประเภท</th>
+              <th class="p-4 text-right">ราคาปัจจุบัน (USD / THB)</th>
+              <th class="p-4 text-right">การเปลี่ยนแปลง</th>
+              <th class="p-4 text-right">จำนวนในพอร์ต</th>
+              <th class="p-4 text-center">คำสั่งซื้อขาย (ทีละ 1 / 10 หน่วย)</th>
+            </tr>
+          </thead>
+          <tbody id="assets-tbody" class="divide-y divide-[#e5dbd0]/50 text-sm">
+            </tbody>
+        </table>
       </div>
-
-      <div class="lg:col-span-4 sticky top-6">
-        <div class="bg-white rounded-2xl border border-[#e5dbd0] shadow-sm p-5 flex flex-col gap-4">
-          <div class="flex justify-between items-center border-b border-[#e5dbd0] pb-3">
-            <h3 class="font-black text-lg text-[#776e65] flex items-center gap-2">
-              💼 พอร์ตโฟลิโอของฉัน <span id="portfolio-count" class="bg-[#8f7a66] text-white text-xs px-2 py-0.5 rounded-full">0</span>
-            </h3>
-            <span class="text-xs font-bold text-[#9e948a]">สรุปยอดถือครอง</span>
-          </div>
-
-          <div class="max-h-[500px] overflow-y-auto flex flex-col gap-3 pr-1" id="portfolio-list">
-            <div class="text-center py-8 text-[#9e948a] text-sm">
-              📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อเพื่อดูต้นทุนเฉลี่ยและกำไรสะสม
-            </div>
-          </div>
-
-          <div class="bg-[#fbf8f3] p-4 rounded-xl border border-[#e5dbd0] text-xs flex flex-col gap-2">
-            <div class="flex justify-between">
-              <span class="text-[#9e948a]">มูลค่าหุ้นและสินทรัพย์รวม:</span>
-              <span id="port-total-assets-usd" class="font-bold text-[#776e65]">$0</span>
-            </div>
-            <div class="flex justify-between border-t border-[#e5dbd0]/70 pt-2 font-bold">
-              <span>รวมกำไร/ขาดทุนสะสม:</span>
-              <span id="port-total-pl" class="text-slate-500">+$0 (0%)</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
 
   </div>
@@ -124,130 +90,133 @@
     let netWorthUsd = 30000;
     let currentFilter = 'ALL';
 
-    // รายชื่อสินทรัพย์ 100 ตัว โดยเพิ่มฟิลด์ avgPrice (ราคาเฉลี่ยที่ซื้อมา) เพิ่มเติม
+    // รายชื่อสินทรัพย์ 100 ตัว โดยเก็บราคาเริ่มต้นจริง (Base Price) ไว้ด้วยเพื่อคำนวณอัตราเติบโตสุทธิ
     let assets = [
       // === ETF ===
-      { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", basePriceUsd: 520, priceUsd: 520, owned: 0, avgPrice: 0, change: 0 },
-      { id: 1, symbol: "QQQ", name: "Invesco QQQ Trust", type: "ETF", basePriceUsd: 440, priceUsd: 440, owned: 0, avgPrice: 0, change: 0 },
-      { id: 2, symbol: "DIA", name: "SPDR Dow Jones Industrial", type: "ETF", basePriceUsd: 390, priceUsd: 390, owned: 0, avgPrice: 0, change: 0 },
-      { id: 3, symbol: "IWM", name: "iShares Russell 2000 ETF", type: "ETF", basePriceUsd: 200, priceUsd: 200, owned: 0, avgPrice: 0, change: 0 },
-      { id: 4, symbol: "VTI", name: "Vanguard Total Stock Market", type: "ETF", basePriceUsd: 260, priceUsd: 260, owned: 0, avgPrice: 0, change: 0 },
-      { id: 5, symbol: "VXUS", name: "Vanguard Total International", type: "ETF", basePriceUsd: 60, priceUsd: 60, owned: 0, avgPrice: 0, change: 0 },
-      { id: 6, symbol: "EEM", name: "iShares MSCI Emerging Markets", type: "ETF", basePriceUsd: 42, priceUsd: 42, owned: 0, avgPrice: 0, change: 0 },
-      { id: 7, symbol: "VWO", name: "Vanguard FTSE Emerging Markets", type: "ETF", basePriceUsd: 45, priceUsd: 45, owned: 0, avgPrice: 0, change: 0 },
-      { id: 8, symbol: "VGK", name: "Vanguard FTSE Europe ETF", type: "ETF", basePriceUsd: 68, priceUsd: 68, owned: 0, avgPrice: 0, change: 0 },
-      { id: 9, symbol: "ARKK", name: "ARK Innovation ETF", type: "ETF", basePriceUsd: 48, priceUsd: 48, owned: 0, avgPrice: 0, change: 0 },
-      { id: 10, symbol: "XLK", name: "Technology Select Sector SPDR", type: "ETF", basePriceUsd: 210, priceUsd: 210, owned: 0, avgPrice: 0, change: 0 },
-      { id: 11, symbol: "XLV", name: "Health Care Select Sector SPDR", type: "ETF", basePriceUsd: 145, priceUsd: 145, owned: 0, avgPrice: 0, change: 0 },
-      { id: 12, symbol: "XLF", name: "Financial Select Sector SPDR", type: "ETF", basePriceUsd: 40, priceUsd: 40, owned: 0, avgPrice: 0, change: 0 },
-      { id: 13, symbol: "VNQ", name: "Vanguard Real Estate ETF", type: "ETF", basePriceUsd: 85, priceUsd: 85, owned: 0, avgPrice: 0, change: 0 },
-      { id: 14, symbol: "VT", name: "Vanguard Total World Stock", type: "ETF", basePriceUsd: 110, priceUsd: 110, owned: 0, avgPrice: 0, change: 0 },
+      { id: 0, symbol: "SPY", name: "SPDR S&P 500 ETF Trust", type: "ETF", basePriceUsd: 520, priceUsd: 520, owned: 0, change: 0 },
+      { id: 1, symbol: "QQQ", name: "Invesco QQQ Trust", type: "ETF", basePriceUsd: 440, priceUsd: 440, owned: 0, change: 0 },
+      { id: 2, symbol: "DIA", name: "SPDR Dow Jones Industrial", type: "ETF", basePriceUsd: 390, priceUsd: 390, owned: 0, change: 0 },
+      { id: 3, symbol: "IWM", name: "iShares Russell 2000 ETF", type: "ETF", basePriceUsd: 200, priceUsd: 200, owned: 0, change: 0 },
+      { id: 4, symbol: "VTI", name: "Vanguard Total Stock Market", type: "ETF", basePriceUsd: 260, priceUsd: 260, owned: 0, change: 0 },
+      { id: 5, symbol: "VXUS", name: "Vanguard Total International", type: "ETF", basePriceUsd: 60, priceUsd: 60, owned: 0, change: 0 },
+      { id: 6, symbol: "EEM", name: "iShares MSCI Emerging Markets", type: "ETF", basePriceUsd: 42, priceUsd: 42, owned: 0, change: 0 },
+      { id: 7, symbol: "VWO", name: "Vanguard FTSE Emerging Markets", type: "ETF", basePriceUsd: 45, priceUsd: 45, owned: 0, change: 0 },
+      { id: 8, symbol: "VGK", name: "Vanguard FTSE Europe ETF", type: "ETF", basePriceUsd: 68, priceUsd: 68, owned: 0, change: 0 },
+      { id: 9, symbol: "ARKK", name: "ARK Innovation ETF", type: "ETF", basePriceUsd: 48, priceUsd: 48, owned: 0, change: 0 },
+      { id: 10, symbol: "XLK", name: "Technology Select Sector SPDR", type: "ETF", basePriceUsd: 210, priceUsd: 210, owned: 0, change: 0 },
+      { id: 11, symbol: "XLV", name: "Health Care Select Sector SPDR", type: "ETF", basePriceUsd: 145, priceUsd: 145, owned: 0, change: 0 },
+      { id: 12, symbol: "XLF", name: "Financial Select Sector SPDR", type: "ETF", basePriceUsd: 40, priceUsd: 40, owned: 0, change: 0 },
+      { id: 13, symbol: "VNQ", name: "Vanguard Real Estate ETF", type: "ETF", basePriceUsd: 85, priceUsd: 85, owned: 0, change: 0 },
+      { id: 14, symbol: "VT", name: "Vanguard Total World Stock", type: "ETF", basePriceUsd: 110, priceUsd: 110, owned: 0, change: 0 },
 
       // === หุ้นรายตัว ===
-      { id: 15, symbol: "AAPL", name: "Apple Inc.", type: "STOCK", priceUsd: 185, owned: 0, avgPrice: 0, change: 0 },
-      { id: 16, symbol: "MSFT", name: "Microsoft Corporation", type: "STOCK", priceUsd: 415, owned: 0, avgPrice: 0, change: 0 },
-      { id: 17, symbol: "NVDA", name: "NVIDIA Corporation", type: "STOCK", priceUsd: 120, owned: 0, avgPrice: 0, change: 0 },
-      { id: 18, symbol: "AMZN", name: "Amazon.com, Inc.", type: "STOCK", priceUsd: 180, owned: 0, avgPrice: 0, change: 0 },
-      { id: 19, symbol: "GOOGL", name: "Alphabet Inc.", type: "STOCK", priceUsd: 170, owned: 0, avgPrice: 0, change: 0 },
-      { id: 20, symbol: "META", name: "Meta Platforms", type: "STOCK", priceUsd: 475, owned: 0, avgPrice: 0, change: 0 },
-      { id: 21, symbol: "TSLA", name: "Tesla, Inc.", type: "STOCK", priceUsd: 175, owned: 0, avgPrice: 0, change: 0 },
-      { id: 22, symbol: "BRK.B", name: "Berkshire Hathaway", type: "STOCK", priceUsd: 410, owned: 0, avgPrice: 0, change: 0 },
-      { id: 23, symbol: "LLY", name: "Eli Lilly and Company", type: "STOCK", priceUsd: 790, owned: 0, avgPrice: 0, change: 0 },
-      { id: 24, symbol: "AVGO", name: "Broadcom Inc.", type: "STOCK", priceUsd: 1300, owned: 0, avgPrice: 0, change: 0 },
-      { id: 25, symbol: "JPM", name: "JPMorgan Chase & Co.", type: "STOCK", priceUsd: 195, owned: 0, avgPrice: 0, change: 0 },
-      { id: 26, symbol: "V", name: "Visa Inc.", type: "STOCK", priceUsd: 275, owned: 0, avgPrice: 0, change: 0 },
-      { id: 27, symbol: "XOM", name: "Exxon Mobil Corporation", type: "STOCK", priceUsd: 115, owned: 0, avgPrice: 0, change: 0 },
-      { id: 28, symbol: "WMT", name: "Walmart Inc.", type: "STOCK", priceUsd: 65, owned: 0, avgPrice: 0, change: 0 },
-      { id: 29, symbol: "MA", name: "Mastercard Incorporated", type: "STOCK", priceUsd: 450, owned: 0, avgPrice: 0, change: 0 },
-      { id: 30, symbol: "UNH", name: "UnitedHealth Group", type: "STOCK", priceUsd: 510, owned: 0, avgPrice: 0, change: 0 },
-      { id: 31, symbol: "ASML", name: "ASML Holding N.V.", type: "STOCK", priceUsd: 930, owned: 0, avgPrice: 0, change: 0 },
-      { id: 32, symbol: "PG", name: "Procter & Gamble", type: "STOCK", priceUsd: 165, owned: 0, avgPrice: 0, change: 0 },
-      { id: 33, symbol: "COST", name: "Costco Wholesale", type: "STOCK", priceUsd: 730, owned: 0, avgPrice: 0, change: 0 },
-      { id: 34, symbol: "JNJ", name: "Johnson & Johnson", type: "STOCK", priceUsd: 155, owned: 0, avgPrice: 0, change: 0 },
-      { id: 35, symbol: "ORCL", name: "Oracle Corporation", type: "STOCK", priceUsd: 125, owned: 0, avgPrice: 0, change: 0 },
-      { id: 36, symbol: "HD", name: "The Home Depot", type: "STOCK", priceUsd: 340, owned: 0, avgPrice: 0, change: 0 },
-      { id: 37, symbol: "BAC", name: "Bank of America", type: "STOCK", priceUsd: 38, owned: 0, avgPrice: 0, change: 0 },
-      { id: 38, symbol: "KO", name: "The Coca-Cola Company", type: "STOCK", priceUsd: 62, owned: 0, avgPrice: 0, change: 0 },
-      { id: 39, symbol: "NFLX", name: "Netflix, Inc.", type: "STOCK", priceUsd: 610, owned: 0, avgPrice: 0, change: 0 },
-      { id: 40, symbol: "MRK", name: "Merck & Co., Inc.", type: "STOCK", priceUsd: 120, owned: 0, avgPrice: 0, change: 0 },
-      { id: 41, symbol: "PEP", name: "PepsiCo, Inc.", type: "STOCK", priceUsd: 170, owned: 0, avgPrice: 0, change: 0 },
-      { id: 42, symbol: "CVX", name: "Chevron Corporation", type: "STOCK", priceUsd: 155, owned: 0, avgPrice: 0, change: 0 },
-      { id: 43, symbol: "AMD", name: "Advanced Micro Devices", type: "STOCK", priceUsd: 160, owned: 0, avgPrice: 0, change: 0 },
-      { id: 44, symbol: "NKE", name: "NIKE, Inc.", type: "STOCK", priceUsd: 92, owned: 0, avgPrice: 0, change: 0 },
-      { id: 45, symbol: "CRM", name: "Salesforce, Inc.", type: "STOCK", priceUsd: 270, owned: 0, avgPrice: 0, change: 0 },
-      { id: 46, symbol: "ADBE", name: "Adobe Inc.", type: "STOCK", priceUsd: 480, owned: 0, avgPrice: 0, change: 0 },
-      { id: 47, symbol: "TM", name: "Toyota Motor Corporation", type: "STOCK", priceUsd: 210, owned: 0, avgPrice: 0, change: 0 },
-      { id: 48, symbol: "MCD", name: "McDonald's Corporation", type: "STOCK", priceUsd: 260, owned: 0, avgPrice: 0, change: 0 },
-      { id: 49, symbol: "CSCO", name: "Cisco Systems, Inc.", type: "STOCK", priceUsd: 48, owned: 0, avgPrice: 0, change: 0 },
-      { id: 50, symbol: "INTC", name: "Intel Corporation", type: "STOCK", priceUsd: 30, owned: 0, avgPrice: 0, change: 0 },
-      { id: 51, symbol: "DIS", name: "The Walt Disney Company", type: "STOCK", priceUsd: 102, owned: 0, avgPrice: 0, change: 0 },
-      { id: 52, symbol: "VZ", name: "Verizon Communications", type: "STOCK", priceUsd: 40, owned: 0, avgPrice: 0, change: 0 },
-      { id: 53, symbol: "CMG", name: "Chipotle Mexican Grill", type: "STOCK", priceUsd: 60, owned: 0, avgPrice: 0, change: 0 },
-      { id: 54, symbol: "IBM", name: "International Business Machines", type: "STOCK", priceUsd: 168, owned: 0, avgPrice: 0, change: 0 },
-      { id: 55, symbol: "SBUX", name: "Starbucks Corporation", type: "STOCK", priceUsd: 88, owned: 0, avgPrice: 0, change: 0 },
-      { id: 56, symbol: "CAT", name: "Caterpillar Inc.", type: "STOCK", priceUsd: 340, owned: 0, avgPrice: 0, change: 0 },
-      { id: 57, symbol: "PFE", name: "Pfizer Inc.", type: "STOCK", priceUsd: 28, owned: 0, avgPrice: 0, change: 0 },
-      { id: 58, symbol: "GE", name: "General Electric Company", type: "STOCK", priceUsd: 155, owned: 0, avgPrice: 0, change: 0 },
-      { id: 59, symbol: "BA", name: "The Boeing Company", type: "STOCK", priceUsd: 175, owned: 0, avgPrice: 0, change: 0 },
-      { id: 60, symbol: "SONY", name: "Sony Group Corporation", type: "STOCK", priceUsd: 82, owned: 0, avgPrice: 0, change: 0 },
-      { id: 61, symbol: "UBER", name: "Uber Technologies, Inc.", type: "STOCK", priceUsd: 68, owned: 0, avgPrice: 0, change: 0 },
-      { id: 62, symbol: "AIR.PA", name: "Airbus SE", type: "STOCK", priceUsd: 150, owned: 0, avgPrice: 0, change: 0 },
-      { id: 63, symbol: "NVR", name: "NVR, Inc.", type: "STOCK", priceUsd: 7500, owned: 0, avgPrice: 0, change: 0 },
-      { id: 64, symbol: "AAL", name: "American Airlines Group", type: "STOCK", priceUsd: 14, owned: 0, avgPrice: 0, change: 0 },
+      { id: 15, symbol: "AAPL", name: "Apple Inc.", type: "STOCK", priceUsd: 185, owned: 0, change: 0 },
+      { id: 16, symbol: "MSFT", name: "Microsoft Corporation", type: "STOCK", priceUsd: 415, owned: 0, change: 0 },
+      { id: 17, symbol: "NVDA", name: "NVIDIA Corporation", type: "STOCK", priceUsd: 120, owned: 0, change: 0 },
+      { id: 18, symbol: "AMZN", name: "Amazon.com, Inc.", type: "STOCK", priceUsd: 180, owned: 0, change: 0 },
+      { id: 19, symbol: "GOOGL", name: "Alphabet Inc.", type: "STOCK", priceUsd: 170, owned: 0, change: 0 },
+      { id: 20, symbol: "META", name: "Meta Platforms", type: "STOCK", priceUsd: 475, owned: 0, change: 0 },
+      { id: 21, symbol: "TSLA", name: "Tesla, Inc.", type: "STOCK", priceUsd: 175, owned: 0, change: 0 },
+      { id: 22, symbol: "BRK.B", name: "Berkshire Hathaway", type: "STOCK", priceUsd: 410, owned: 0, change: 0 },
+      { id: 23, symbol: "LLY", name: "Eli Lilly and Company", type: "STOCK", priceUsd: 790, owned: 0, change: 0 },
+      { id: 24, symbol: "AVGO", name: "Broadcom Inc.", type: "STOCK", priceUsd: 1300, owned: 0, change: 0 },
+      { id: 25, symbol: "JPM", name: "JPMorgan Chase & Co.", type: "STOCK", priceUsd: 195, owned: 0, change: 0 },
+      { id: 26, symbol: "V", name: "Visa Inc.", type: "STOCK", priceUsd: 275, owned: 0, change: 0 },
+      { id: 27, symbol: "XOM", name: "Exxon Mobil Corporation", type: "STOCK", priceUsd: 115, owned: 0, change: 0 },
+      { id: 28, symbol: "WMT", name: "Walmart Inc.", type: "STOCK", priceUsd: 65, owned: 0, change: 0 },
+      { id: 29, symbol: "MA", name: "Mastercard Incorporated", type: "STOCK", priceUsd: 450, owned: 0, change: 0 },
+      { id: 30, symbol: "UNH", name: "UnitedHealth Group", type: "STOCK", priceUsd: 510, owned: 0, change: 0 },
+      { id: 31, symbol: "ASML", name: "ASML Holding N.V.", type: "STOCK", priceUsd: 930, owned: 0, change: 0 },
+      { id: 32, symbol: "PG", name: "Procter & Gamble", type: "STOCK", priceUsd: 165, owned: 0, change: 0 },
+      { id: 33, symbol: "COST", name: "Costco Wholesale", type: "STOCK", priceUsd: 730, owned: 0, change: 0 },
+      { id: 34, symbol: "JNJ", name: "Johnson & Johnson", type: "STOCK", priceUsd: 155, owned: 0, change: 0 },
+      { id: 35, symbol: "ORCL", name: "Oracle Corporation", type: "STOCK", priceUsd: 125, owned: 0, change: 0 },
+      { id: 36, symbol: "HD", name: "The Home Depot", type: "STOCK", priceUsd: 340, owned: 0, change: 0 },
+      { id: 37, symbol: "BAC", name: "Bank of America", type: "STOCK", priceUsd: 38, owned: 0, change: 0 },
+      { id: 38, symbol: "KO", name: "The Coca-Cola Company", type: "STOCK", priceUsd: 62, owned: 0, change: 0 },
+      { id: 39, symbol: "NFLX", name: "Netflix, Inc.", type: "STOCK", priceUsd: 610, owned: 0, change: 0 },
+      { id: 40, symbol: "MRK", name: "Merck & Co., Inc.", type: "STOCK", priceUsd: 120, owned: 0, change: 0 },
+      { id: 41, symbol: "PEP", name: "PepsiCo, Inc.", type: "STOCK", priceUsd: 170, owned: 0, change: 0 },
+      { id: 42, symbol: "CVX", name: "Chevron Corporation", type: "STOCK", priceUsd: 155, owned: 0, change: 0 },
+      { id: 43, symbol: "AMD", name: "Advanced Micro Devices", type: "STOCK", priceUsd: 160, owned: 0, change: 0 },
+      { id: 44, symbol: "NKE", name: "NIKE, Inc.", type: "STOCK", priceUsd: 92, owned: 0, change: 0 },
+      { id: 45, symbol: "CRM", name: "Salesforce, Inc.", type: "STOCK", priceUsd: 270, owned: 0, change: 0 },
+      { id: 46, symbol: "ADBE", name: "Adobe Inc.", type: "STOCK", priceUsd: 480, owned: 0, change: 0 },
+      { id: 47, symbol: "TM", name: "Toyota Motor Corporation", type: "STOCK", priceUsd: 210, owned: 0, change: 0 },
+      { id: 48, symbol: "MCD", name: "McDonald's Corporation", type: "STOCK", priceUsd: 260, owned: 0, change: 0 },
+      { id: 49, symbol: "CSCO", name: "Cisco Systems, Inc.", type: "STOCK", priceUsd: 48, owned: 0, change: 0 },
+      { id: 50, symbol: "INTC", name: "Intel Corporation", type: "STOCK", priceUsd: 30, owned: 0, change: 0 },
+      { id: 51, symbol: "DIS", name: "The Walt Disney Company", type: "STOCK", priceUsd: 102, owned: 0, change: 0 },
+      { id: 52, symbol: "VZ", name: "Verizon Communications", type: "STOCK", priceUsd: 40, owned: 0, change: 0 },
+      { id: 53, symbol: "CMG", name: "Chipotle Mexican Grill", type: "STOCK", priceUsd: 60, owned: 0, change: 0 },
+      { id: 54, symbol: "IBM", name: "International Business Machines", type: "STOCK", priceUsd: 168, owned: 0, change: 0 },
+      { id: 55, symbol: "SBUX", name: "Starbucks Corporation", type: "STOCK", priceUsd: 88, owned: 0, change: 0 },
+      { id: 56, symbol: "CAT", name: "Caterpillar Inc.", type: "STOCK", priceUsd: 340, owned: 0, change: 0 },
+      { id: 57, symbol: "PFE", name: "Pfizer Inc.", type: "STOCK", priceUsd: 28, owned: 0, change: 0 },
+      { id: 58, symbol: "GE", name: "General Electric Company", type: "STOCK", priceUsd: 155, owned: 0, change: 0 },
+      { id: 59, symbol: "BA", name: "The Boeing Company", type: "STOCK", priceUsd: 175, owned: 0, change: 0 },
+      { id: 60, symbol: "SONY", name: "Sony Group Corporation", type: "STOCK", priceUsd: 82, owned: 0, change: 0 },
+      { id: 61, symbol: "UBER", name: "Uber Technologies, Inc.", type: "STOCK", priceUsd: 68, owned: 0, change: 0 },
+      { id: 62, symbol: "AIR.PA", name: "Airbus SE", type: "STOCK", priceUsd: 150, owned: 0, change: 0 },
+      { id: 63, symbol: "NVR", name: "NVR, Inc.", type: "STOCK", priceUsd: 7500, owned: 0, change: 0 },
+      { id: 64, symbol: "AAL", name: "American Airlines Group", type: "STOCK", priceUsd: 14, owned: 0, change: 0 },
 
       // === คริปโต ===
-      { id: 65, symbol: "BTC", name: "Bitcoin", type: "CRYPTO", priceUsd: 60000, owned: 0, avgPrice: 0, change: 0 },
-      { id: 66, symbol: "ETH", name: "Ethereum", type: "CRYPTO", priceUsd: 3000, owned: 0, avgPrice: 0, change: 0 },
-      { id: 67, symbol: "BNB", name: "BNB (Binance)", type: "CRYPTO", priceUsd: 580, owned: 0, avgPrice: 0, change: 0 },
-      { id: 68, symbol: "SOL", name: "Solana", type: "CRYPTO", priceUsd: 140, owned: 0, avgPrice: 0, change: 0 },
-      { id: 69, symbol: "XRP", name: "Ripple", type: "CRYPTO", priceUsd: 0.5, owned: 0, avgPrice: 0, change: 0 },
-      { id: 70, symbol: "ADA", name: "Cardano", type: "CRYPTO", priceUsd: 0.4, owned: 0, avgPrice: 0, change: 0 },
-      { id: 71, symbol: "DOT", name: "Polkadot", type: "CRYPTO", priceUsd: 6.5, owned: 0, avgPrice: 0, change: 0 },
-      { id: 72, symbol: "DOGE", name: "Dogecoin", type: "CRYPTO", priceUsd: 0.12, owned: 0, avgPrice: 0, change: 0 },
-      { id: 73, symbol: "AVAX", name: "Avalanche", type: "CRYPTO", priceUsd: 25, owned: 0, avgPrice: 0, change: 0 },
-      { id: 74, symbol: "LINK", name: "Chainlink", type: "CRYPTO", priceUsd: 14, owned: 0, avgPrice: 0, change: 0 },
-      { id: 75, symbol: "MATIC", name: "Polygon MATIC", type: "CRYPTO", priceUsd: 0.7, owned: 0, avgPrice: 0, change: 0 },
-      { id: 76, symbol: "LTC", name: "Litecoin", type: "CRYPTO", priceUsd: 80, owned: 0, avgPrice: 0, change: 0 },
-      { id: 77, symbol: "UNI", name: "Uniswap", type: "CRYPTO", priceUsd: 7.5, owned: 0, avgPrice: 0, change: 0 },
-      { id: 78, symbol: "SHIB", name: "Shiba Inu", type: "CRYPTO", priceUsd: 0.00002, owned: 0, avgPrice: 0, change: 0 },
-      { id: 79, symbol: "ATOM", name: "Cosmos", type: "CRYPTO", priceUsd: 8.5, owned: 0, avgPrice: 0, change: 0 },
-      { id: 80, symbol: "XLM", name: "Stellar Lumens", type: "CRYPTO", priceUsd: 0.11, owned: 0, avgPrice: 0, change: 0 },
-      { id: 81, symbol: "XMR", name: "Monero", type: "CRYPTO", priceUsd: 160, owned: 0, avgPrice: 0, change: 0 },
-      { id: 82, symbol: "ETC", name: "Ethereum Classic", type: "CRYPTO", priceUsd: 22, owned: 0, avgPrice: 0, change: 0 },
-      { id: 83, symbol: "FIL", name: "Filecoin", type: "CRYPTO", priceUsd: 5.5, owned: 0, avgPrice: 0, change: 0 },
-      { id: 84, symbol: "LDO", name: "Lido DAO", type: "CRYPTO", priceUsd: 2.1, owned: 0, avgPrice: 0, change: 0 },
-      { id: 85, symbol: "APT", name: "Aptos", type: "CRYPTO", priceUsd: 8.2, owned: 0, avgPrice: 0, change: 0 },
-      { id: 86, symbol: "SUI", name: "Sui Network", type: "CRYPTO", priceUsd: 1.2, owned: 0, avgPrice: 0, change: 0 },
-      { id: 87, symbol: "NEAR", name: "NEAR Protocol", type: "CRYPTO", priceUsd: 4.5, owned: 0, avgPrice: 0, change: 0 },
-      { id: 88, symbol: "OP", name: "Optimism", type: "CRYPTO", priceUsd: 2.3, owned: 0, avgPrice: 0, change: 0 },
-      { id: 89, symbol: "ARB", name: "Arbitrum", type: "CRYPTO", priceUsd: 0.95, owned: 0, avgPrice: 0, change: 0 },
-      { id: 90, symbol: "ICP", name: "Internet Computer", type: "CRYPTO", priceUsd: 11, owned: 0, avgPrice: 0, change: 0 },
-      { id: 91, symbol: "VET", name: "VeChain", type: "CRYPTO", priceUsd: 0.03, owned: 0, avgPrice: 0, change: 0 },
-      { id: 92, symbol: "MKR", name: "Maker", type: "CRYPTO", priceUsd: 2200, owned: 0, avgPrice: 0, change: 0 },
-      { id: 93, symbol: "GRT", name: "The Graph", type: "CRYPTO", priceUsd: 0.22, owned: 0, avgPrice: 0, change: 0 },
-      { id: 94, symbol: "RUNE", name: "THORChain", type: "CRYPTO", priceUsd: 5.5, owned: 0, avgPrice: 0, change: 0 },
+      { id: 65, symbol: "BTC", name: "Bitcoin", type: "CRYPTO", priceUsd: 60000, owned: 0, change: 0 },
+      { id: 66, symbol: "ETH", name: "Ethereum", type: "CRYPTO", priceUsd: 3000, owned: 0, change: 0 },
+      { id: 67, symbol: "BNB", name: "BNB (Binance)", type: "CRYPTO", priceUsd: 580, owned: 0, change: 0 },
+      { id: 68, symbol: "SOL", name: "Solana", type: "CRYPTO", priceUsd: 140, owned: 0, change: 0 },
+      { id: 69, symbol: "XRP", name: "Ripple", type: "CRYPTO", priceUsd: 0.5, owned: 0, change: 0 },
+      { id: 70, symbol: "ADA", name: "Cardano", type: "CRYPTO", priceUsd: 0.4, owned: 0, change: 0 },
+      { id: 71, symbol: "DOT", name: "Polkadot", type: "CRYPTO", priceUsd: 6.5, owned: 0, change: 0 },
+      { id: 72, symbol: "DOGE", name: "Dogecoin", type: "CRYPTO", priceUsd: 0.12, owned: 0, change: 0 },
+      { id: 73, symbol: "AVAX", name: "Avalanche", type: "CRYPTO", priceUsd: 25, owned: 0, change: 0 },
+      { id: 74, symbol: "LINK", name: "Chainlink", type: "CRYPTO", priceUsd: 14, owned: 0, change: 0 },
+      { id: 75, symbol: "MATIC", name: "Polygon MATIC", type: "CRYPTO", priceUsd: 0.7, owned: 0, change: 0 },
+      { id: 76, symbol: "LTC", name: "Litecoin", type: "CRYPTO", priceUsd: 80, owned: 0, change: 0 },
+      { id: 77, symbol: "UNI", name: "Uniswap", type: "CRYPTO", priceUsd: 7.5, owned: 0, change: 0 },
+      { id: 78, symbol: "SHIB", name: "Shiba Inu", type: "CRYPTO", priceUsd: 0.00002, owned: 0, change: 0 },
+      { id: 79, symbol: "ATOM", name: "Cosmos", type: "CRYPTO", priceUsd: 8.5, owned: 0, change: 0 },
+      { id: 80, symbol: "XLM", name: "Stellar Lumens", type: "CRYPTO", priceUsd: 0.11, owned: 0, change: 0 },
+      { id: 81, symbol: "XMR", name: "Monero", type: "CRYPTO", priceUsd: 160, owned: 0, change: 0 },
+      { id: 82, symbol: "ETC", name: "Ethereum Classic", type: "CRYPTO", priceUsd: 22, owned: 0, change: 0 },
+      { id: 83, symbol: "FIL", name: "Filecoin", type: "CRYPTO", priceUsd: 5.5, owned: 0, change: 0 },
+      { id: 84, symbol: "LDO", name: "Lido DAO", type: "CRYPTO", priceUsd: 2.1, owned: 0, change: 0 },
+      { id: 85, symbol: "APT", name: "Aptos", type: "CRYPTO", priceUsd: 8.2, owned: 0, change: 0 },
+      { id: 86, symbol: "SUI", name: "Sui Network", type: "CRYPTO", priceUsd: 1.2, owned: 0, change: 0 },
+      { id: 87, symbol: "NEAR", name: "NEAR Protocol", type: "CRYPTO", priceUsd: 4.5, owned: 0, change: 0 },
+      { id: 88, symbol: "OP", name: "Optimism", type: "CRYPTO", priceUsd: 2.3, owned: 0, change: 0 },
+      { id: 89, symbol: "ARB", name: "Arbitrum", type: "CRYPTO", priceUsd: 0.95, owned: 0, change: 0 },
+      { id: 90, symbol: "ICP", name: "Internet Computer", type: "CRYPTO", priceUsd: 11, owned: 0, change: 0 },
+      { id: 91, symbol: "VET", name: "VeChain", type: "CRYPTO", priceUsd: 0.03, owned: 0, change: 0 },
+      { id: 92, symbol: "MKR", name: "Maker", type: "CRYPTO", priceUsd: 2200, owned: 0, change: 0 },
+      { id: 93, symbol: "GRT", name: "The Graph", type: "CRYPTO", priceUsd: 0.22, owned: 0, change: 0 },
+      { id: 94, symbol: "RUNE", name: "THORChain", type: "CRYPTO", priceUsd: 5.5, owned: 0, change: 0 },
 
       // === ทองคำ/โลหะ ===
-      { id: 95, symbol: "GOLD", name: "Gold (XAU/USD)", type: "METAL", priceUsd: 2350, owned: 0, avgPrice: 0, change: 0 },
-      { id: 96, symbol: "SILVER", name: "Silver (XAG/USD)", type: "METAL", priceUsd: 28, owned: 0, avgPrice: 0, change: 0 },
-      { id: 97, symbol: "PLAT", name: "Platinum ทองคำขาว", type: "METAL", priceUsd: 960, owned: 0, avgPrice: 0, change: 0 },
-      { id: 98, symbol: "PALL", name: "Palladium พัลลาเดียม", type: "METAL", priceUsd: 1020, owned: 0, avgPrice: 0, change: 0 },
-      { id: 99, symbol: "COPPER", name: "Copper ทองแดง", type: "METAL", priceUsd: 4.5, owned: 0, avgPrice: 0, change: 0 }
+      { id: 95, symbol: "GOLD", name: "Gold (XAU/USD) ออนซ์", type: "METAL", priceUsd: 2350, owned: 0, change: 0 },
+      { id: 96, symbol: "SILVER", name: "Silver (XAG/USD) ออนซ์", type: "METAL", priceUsd: 28, owned: 0, change: 0 },
+      { id: 97, symbol: "PLAT", name: "Platinum ทองคำขาว ออนซ์", type: "METAL", priceUsd: 960, owned: 0, change: 0 },
+      { id: 98, symbol: "PALL", name: "Palladium พัลลาเดียม ออนซ์", type: "METAL", priceUsd: 1020, owned: 0, change: 0 },
+      { id: 99, symbol: "COPPER", name: "Copper ทองแดง", type: "METAL", priceUsd: 4.5, owned: 0, change: 0 }
     ];
 
-    // โครงสร้างค่าความผันผวนของหุ้นย่อยที่อิงตลาดจริง
+    // กำหนดโครงสร้างคุณสมบัติความผันผวนและแนวโน้มจริงของหุ้นรายตัวและทองคำ
     const assetBehaviors = {
+      // หุ้นเติบโตเทคโนโลยี (ผันผวนสูงมาก บวกแรงลบแรง)
       "NVDA": { volt: 0.045, trend: 0.0015 },
       "TSLA": { volt: 0.040, trend: 0.0010 },
       "AMD": { volt: 0.035, trend: 0.0008 },
       "AVGO": { volt: 0.030, trend: 0.0007 },
       "ASML": { volt: 0.028, trend: 0.0006 },
+      // หุ้นบิ๊กเทค (ผันผวนกลาง เติบโตดี)
       "AAPL": { volt: 0.018, trend: 0.0005 },
       "MSFT": { volt: 0.016, trend: 0.0005 },
       "AMZN": { volt: 0.020, trend: 0.0006 },
       "GOOGL": { volt: 0.019, trend: 0.0004 },
       "META": { volt: 0.025, trend: 0.0007 },
       "NFLX": { volt: 0.026, trend: 0.0005 },
+      // หุ้นดั้งเดิม/การเงิน/สุขภาพ (ผันผวนต่ำ ค่อยๆ ขยับตามดัชนีหลัก)
       "BRK.B": { volt: 0.010, trend: 0.0003 },
       "JPM": { volt: 0.014, trend: 0.0003 },
       "V": { volt: 0.012, trend: 0.0004 },
@@ -257,7 +226,8 @@
       "JNJ": { volt: 0.007, trend: 0.0001 },
       "WMT": { volt: 0.011, trend: 0.0003 },
       "UNH": { volt: 0.012, trend: 0.0002 },
-      "GOLD": { volt: 0.009, trend: 0.0002 }, 
+      // ทองคำและโลหะมีค่า
+      "GOLD": { volt: 0.009, trend: 0.0002 }, // ปลอดภัย เสถียรสูง
       "SILVER": { volt: 0.018, trend: 0.0003 },
       "PLAT": { volt: 0.014, trend: 0.0001 }
     };
@@ -271,9 +241,6 @@
       document.getElementById('display-networth-usd').innerText = "$" + Math.floor(netWorthUsd).toLocaleString();
       document.getElementById('display-cash-thb').innerText = "≈ " + Math.floor(cashUsd * FX_RATE).toLocaleString() + " บาท";
       document.getElementById('display-networth-thb').innerText = "≈ " + Math.floor(netWorthUsd * FX_RATE).toLocaleString() + " บาท";
-
-      // อัปเดตฝั่งแถบพอร์ตโฟลิโอส่วนตัวทางขวา
-      renderPortfolio();
     }
 
     function renderTable() {
@@ -293,16 +260,23 @@
           changeClass = "text-rose-500 font-bold";
         }
 
+        let priceThb = a.priceUsd * FX_RATE;
         let fixedUsd = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
+        let fixedThb = priceThb < 0.1 ? priceThb.toFixed(4) : priceThb.toLocaleString(undefined, {maximumFractionDigits:2});
 
         let row = `
           <tr class="hover:bg-[#fbf8f3] transition">
             <td class="p-4">
               <span class="font-black text-[#f59563] block">${a.symbol}</span>
-              <span class="text-xs text-[#9e948a] line-clamp-1">${a.name}</span>
+              <span class="text-xs text-[#9e948a]">${a.name}</span>
             </td>
-            <td class="p-4 text-right font-mono font-bold text-[#776e65]">$${fixedUsd}</td>
-            <td class="p-4 text-right font-mono ${changeClass} text-xs">${changeText}</td>
+            <td class="p-4 text-xs font-bold text-[#9e948a] uppercase">${a.type}</td>
+            <td class="p-4 text-right font-mono font-bold text-[#776e65]">
+              <div>$${fixedUsd}</div>
+              <div class="text-xs text-[#9e948a]">฿${fixedThb}</div>
+            </td>
+            <td class="p-4 text-right font-mono ${changeClass}">${changeText}</td>
+            <td class="p-4 text-right font-mono font-black text-[#f2b179]">${a.owned}</td>
             <td class="p-4 text-center">
               <div class="flex gap-1 justify-center">
                 <button onclick="trade(${a.id}, 'BUY', 1)" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-2 py-1 rounded font-bold transition">ซื้อ 1</button>
@@ -317,85 +291,6 @@
       });
     }
 
-    // ฟังก์ชันใหม่: แสดงรายการพอร์ตโฟลิโอส่วนบุคคลทางขวา
-    function renderPortfolio() {
-      const portList = document.getElementById('portfolio-list');
-      const ownedAssets = assets.filter(a => a.owned > 0);
-      
-      document.getElementById('portfolio-count').innerText = ownedAssets.length;
-
-      if (ownedAssets.length === 0) {
-        portList.innerHTML = `
-          <div class="text-center py-8 text-[#9e948a] text-sm">
-            📭 ยังไม่มีสินทรัพย์ในครอบครอง<br>เริ่มซื้อเพื่อดูต้นทุนเฉลี่ยและกำไรสะสม
-          </div>
-        `;
-        document.getElementById('port-total-assets-usd').innerText = "$0";
-        document.getElementById('port-total-pl').innerText = "+$0 (0.00%)";
-        document.getElementById('port-total-pl').className = "text-slate-500 font-bold";
-        return;
-      }
-
-      let totalPortValue = 0;
-      let totalCostOfOwned = 0;
-      let html = '';
-
-      ownedAssets.forEach(a => {
-        let currentVal = a.owned * a.priceUsd;
-        let totalCost = a.owned * a.avgPrice;
-        let plUsd = currentVal - totalCost;
-        let plPercent = a.avgPrice > 0 ? (plUsd / totalCost) * 100 : 0;
-
-        totalPortValue += currentVal;
-        totalCostOfOwned += totalCost;
-
-        let plClass = "text-slate-500";
-        let plSign = "";
-        if (plUsd > 0.01) {
-          plClass = "text-emerald-600 font-bold";
-          plSign = "+";
-        } else if (plUsd < -0.01) {
-          plClass = "text-rose-500 font-bold";
-        }
-
-        let formatAvg = a.avgPrice < 0.1 ? a.avgPrice.toFixed(5) : a.avgPrice.toLocaleString(undefined, {maximumFractionDigits:2});
-        let formatPrice = a.priceUsd < 0.1 ? a.priceUsd.toFixed(5) : a.priceUsd.toLocaleString(undefined, {maximumFractionDigits:2});
-
-        html += `
-          <div class="bg-white border border-[#e5dbd0] p-3 rounded-xl flex flex-col gap-1 shadow-sm hover:border-[#f2b179] transition">
-            <div class="flex justify-between items-center">
-              <span class="font-black text-[#776e65] text-base">${a.symbol} <span class="text-xs font-normal text-[#9e948a] ml-1">x${a.owned}</span></span>
-              <span class="text-xs px-2 py-0.5 rounded font-bold uppercase ${a.type === 'ETF' ? 'bg-blue-100 text-blue-700' : a.type === 'STOCK' ? 'bg-orange-100 text-orange-700' : a.type === 'CRYPTO' ? 'bg-purple-100 text-purple-700' : 'bg-yellow-100 text-yellow-700'}">${a.type}</span>
-            </div>
-            
-            <div class="grid grid-cols-2 text-xs text-[#9e948a] pt-1 border-t border-[#faf8ef]">
-              <div>เฉลี่ย (Avg): <span class="font-mono text-[#776e65] font-bold">$${formatAvg}</span></div>
-              <div class="text-right">ตลาด (Price): <span class="font-mono text-[#776e65] font-bold">$${formatPrice}</span></div>
-            </div>
-
-            <div class="flex justify-between items-center pt-1 border-t border-[#faf8ef] text-xs">
-              <span class="text-[#9e948a]">รวมมูลค่า: <span class="font-mono font-bold text-[#776e65]">$${currentVal.toLocaleString(undefined, {maximumFractionDigits:2})}</span></span>
-              <span class="${plClass} font-mono">${plSign}$${plUsd.toLocaleString(undefined, {maximumFractionDigits:2})} (${plSign}${plPercent.toFixed(2)}%)</span>
-            </div>
-          </div>
-        `;
-      });
-
-      portList.innerHTML = html;
-      document.getElementById('port-total-assets-usd').innerText = "$" + totalPortValue.toLocaleString(undefined, {maximumFractionDigits:2});
-      
-      let overallPlUsd = totalPortValue - totalCostOfOwned;
-      let overallPlPercent = totalCostOfOwned > 0 ? (overallPlUsd / totalCostOfOwned) * 100 : 0;
-      let overallSign = overallPlUsd > 0.01 ? "+" : "";
-      
-      let overallClass = "text-slate-500 font-bold";
-      if (overallPlUsd > 0.01) overallClass = "text-emerald-600 font-bold";
-      else if (overallPlUsd < -0.01) overallClass = "text-rose-500 font-bold";
-
-      document.getElementById('port-total-pl').innerText = `${overallSign}$${overallPlUsd.toLocaleString(undefined, {maximumFractionDigits:2})} (${overallSign}${overallPlPercent.toFixed(2)}%)`;
-      document.getElementById('port-total-pl').className = overallClass;
-    }
-
     function trade(id, action, quantity) {
       let asset = assets[id];
       let totalCostUsd = asset.priceUsd * quantity;
@@ -403,14 +298,7 @@
       if (action === 'BUY') {
         if (cashUsd >= totalCostUsd) {
           cashUsd -= totalCostUsd;
-          
-          // 🔥 คำนวณราคาเฉลี่ยถ่วงน้ำหนักใหม่ (Weighted Average Cost)
-          let oldTotalCost = asset.owned * asset.avgPrice;
-          let newTotalCost = oldTotalCost + totalCostUsd;
           asset.owned += quantity;
-          asset.avgPrice = newTotalCost / asset.owned;
-          
-          document.getElementById('display-status').innerText = `🛒 ซื้อสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ที่ราคา $${asset.priceUsd.toFixed(2)}`;
         } else {
           alert(`เงินสด USD ไม่พอซื้อ!`);
         }
@@ -418,11 +306,6 @@
         if (asset.owned >= quantity) {
           asset.owned -= quantity;
           cashUsd += totalCostUsd;
-          
-          if (asset.owned === 0) {
-            asset.avgPrice = 0; // ล้างประวัติเฉลี่ยหากไม่ได้ถือครองแล้ว
-          }
-          document.getElementById('display-status').innerText = `💸 ขายสำเร็จ: ${asset.symbol} จำนวน ${quantity} หน่วย ที่ราคา $${asset.priceUsd.toFixed(2)}`;
         } else {
           alert(`คุณมีสินทรัพย์ไม่พอขาย!`);
         }
@@ -431,33 +314,35 @@
       renderTable();
     }
 
+    // ฟังก์ชันคำนวณและดึงข้อมูลอัตราราคาของสินทรัพย์แต่ละตัวตามพฤติกรรมในชีวิตจริง
     function refreshPrices() {
       const btn = document.getElementById('btn-refresh');
       btn.disabled = true;
       document.getElementById('display-status').innerText = "⏳ กำลังคำนวณราคาจำลองตามพฤติกรรมหุ้นและดัชนี ETF จริง...";
 
       setTimeout(() => {
-        // ขั้นตอนที่ 1: สุ่มปรับราคาหุ้นรายตัว (STOCK) และ โลหะ (METAL) ตามแนวโน้มจริง
+        // ขั้นตอนที่ 1: สุ่มปรับราคาหุ้นรายตัว (STOCK) และ โลหะ (METAL) ตามอัตลักษณ์พฤติกรรมจริง
         assets.forEach(a => {
           if (a.type === 'STOCK' || a.type === 'METAL') {
-            const config = assetBehaviors[a.symbol] || { volt: 0.015, trend: 0.0003 };
+            const config = assetBehaviors[a.symbol] || { volt: 0.015, trend: 0.0003 }; // ค่าเริ่มต้นหากไม่ระบุ
             
+            // ใช้เทคนิคสุ่มสไตล์ Brownian Motion (มีแรงสะสม Trend + ค่าผันผวนจำลองจริง)
             const randomShock = (Math.random() * 2 - 1) * config.volt;
             const changePercent = config.trend + randomShock;
 
             a.change = changePercent;
             a.priceUsd = Math.max(0.01, a.priceUsd * (1 + changePercent));
           }
-          // ขั้นตอนที่ 2: คริปโต สุ่มอิสระและผันผวนสูงมาก
+          // ขั้นตอนที่ 2: สำหรับ CRYPTO สุ่มสวิงแรงตามคำขอของผู้ใช้ (สุ่มอิสระ)
           else if (a.type === 'CRYPTO') {
-            const cryptoVolt = 0.06; 
-            const changePercent = (Math.random() * 2 - 1.02) * cryptoVolt; 
+            const cryptoVolt = 0.06; // ความผันผวนสูงมาก
+            const changePercent = (Math.random() * 2 - 1.02) * cryptoVolt; // มีแนวโน้มย้อยลงนิดหน่อยเฉลี่ยสะท้อนความเสี่ยงคริปโต
             a.change = changePercent;
             a.priceUsd = Math.max(0.00001, a.priceUsd * (1 + changePercent));
           }
         });
 
-        // ขั้นตอนที่ 3: คำนวณราคา ETF เชื่อมจากหุ้นย่อยที่อ้างอิงจริง
+        // ขั้นตอนที่ 3: คำนวณราคา ETF โดยเชื่อมโยงมาจากหุ้นย่อยที่อ้างอิงจริงในตลาดหุ้น
         const getGrowth = (symbol) => {
           const item = assets.find(x => x.symbol === symbol);
           return item ? (item.priceUsd / (item.basePriceUsd || item.priceUsd)) : 1;
@@ -468,35 +353,41 @@
             let trackedGrowth = 1;
 
             if (a.symbol === "SPY") {
+              // ดัชนี S&P 500 (กระจายสัดส่วนตามหุ้นยักษ์ใหญ่คละกลุ่ม)
               trackedGrowth = (
                 getGrowth("MSFT") * 0.15 + getGrowth("AAPL") * 0.14 + getGrowth("NVDA") * 0.12 +
                 getGrowth("AMZN") * 0.10 + getGrowth("GOOGL") * 0.09 + getGrowth("META") * 0.08 +
                 getGrowth("BRK.B") * 0.08 + getGrowth("JPM") * 0.08 + getGrowth("V") * 0.08 + getGrowth("UNH") * 0.08
               );
             } else if (a.symbol === "QQQ") {
+              // ดัชนี Nasdaq 100 (เน้นกลุ่มเทคโนโลยี Big Tech 7 นางฟ้า)
               trackedGrowth = (
                 getGrowth("AAPL") * 0.20 + getGrowth("MSFT") * 0.20 + getGrowth("NVDA") * 0.18 +
                 getGrowth("AMZN") * 0.13 + getGrowth("GOOGL") * 0.11 + getGrowth("META") * 0.11 + getGrowth("TSLA") * 0.07
               );
             } else if (a.symbol === "DIA") {
+              // ดัชนี Dow Jones (เน้นหุ้นปลอดภัยและหุ้นสถาบันการเงินการค้า)
               trackedGrowth = (
                 getGrowth("UNH") * 0.15 + getGrowth("MSFT") * 0.15 + getGrowth("HD") * 0.10 +
                 getGrowth("MCD") * 0.10 + getGrowth("CRM") * 0.10 + getGrowth("V") * 0.10 +
                 getGrowth("JPM") * 0.10 + getGrowth("KO") * 0.10 + getGrowth("PG") * 0.10
               );
             } else if (a.symbol === "XLK") {
+              // กองทุนเทคโนโลยีสหรัฐฯ โดยตรง
               trackedGrowth = (
                 getGrowth("MSFT") * 0.22 + getGrowth("AAPL") * 0.20 + getGrowth("NVDA") * 0.20 +
                 getGrowth("AVGO") * 0.10 + getGrowth("CRM") * 0.08 + getGrowth("ADBE") * 0.07 +
                 getGrowth("AMD") * 0.05 + getGrowth("INTC") * 0.04 + getGrowth("ORCL") * 0.04
               );
             } else {
+              // ETF อื่นๆ (เฉลี่ยราคาตามความเติบโตภาพรวมของหุ้นในบอร์ด)
               const avgStockGrowth = assets
                 .filter(x => x.type === 'STOCK')
                 .reduce((acc, curr) => acc + (curr.priceUsd / curr.priceUsd), 0) / 50;
               trackedGrowth = avgStockGrowth;
             }
 
+            // อัปเดตราคาและเปอร์เซ็นต์การเปลี่ยนแปลงจริง
             const prevPrice = a.priceUsd;
             a.priceUsd = a.basePriceUsd * trackedGrowth;
             a.change = (a.priceUsd - prevPrice) / prevPrice;
@@ -505,7 +396,7 @@
 
         let now = new Date();
         document.getElementById('display-time').innerText = now.toLocaleTimeString();
-        document.getElementById('display-status').innerText = "✅ จำลองปรับเปลี่ยนราคาตลาดเสร็จสิ้น (พอร์ตของคุณอัปเดตราคาตลาดปัจจุบันแล้ว!)";
+        document.getElementById('display-status').innerText = "✅ อัปเดตราคาตลาดคู่ขนาน (ETF ผูกราคาเชื่อมกับราคาหุ้นจริง) เรียบร้อยแล้ว!";
         updateDashboard();
         renderTable();
         btn.disabled = false;
@@ -517,9 +408,9 @@
       ['ALL', 'ETF', 'STOCK', 'CRYPTO', 'METAL'].forEach(t => {
         const btn = document.getElementById(`tab-${t}`);
         if (t === type) {
-          btn.className = "px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-[#8f7a66] text-white whitespace-nowrap";
+          btn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-[#8f7a66] text-white";
         } else {
-          btn.className = "px-4 py-2 text-xs md:text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3] whitespace-nowrap";
+          btn.className = "px-4 py-2 text-sm font-bold rounded-lg bg-white border border-[#e5dbd0] text-[#776e65] hover:bg-[#fbf8f3]";
         }
       });
       renderTable();
