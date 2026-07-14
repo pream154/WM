@@ -3,84 +3,213 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blackjack Game 🃏</title>
+  <title>Blackjack: Theme Merge 🃏</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background-color: #2c3e50;
-      color: white;
+      background-color: #faf8ef; /* สีพื้นหลังหลักแบบ 2048 */
+      color: #776e65; /* สีตัวอักษรหลัก */
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       margin: 0;
+      padding: 20px;
+      box-sizing: border-box;
     }
-    .game-container {
-      background-color: #1a252f;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-      max-width: 450px;
-      width: 100%;
-      text-align: center;
-    }
-    h1 { color: #f1c40f; margin-top: 0; }
-    .status { font-size: 1.3rem; margin: 15px 0; font-weight: bold; color: #e74c3c; }
-    .section {
-      background: #2c3e50;
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-    }
-    .cards-display { font-size: 2rem; margin-top: 10px; letter-spacing: 5px; }
-    .score { font-size: 1rem; color: #bdc3c7; }
-    .controls { display: flex; justify-content: center; gap: 10px; margin-top: 20px; }
-    button {
-      background-color: #3498db;
-      color: white;
-      border: none;
-      padding: 12px 20px;
-      font-size: 1.1rem;
-      border-radius: 6px;
-      cursor: pointer;
+
+    .subtitle {
+      font-size: 0.9rem;
+      letter-spacing: 2px;
+      color: #9e948a;
+      text-transform: uppercase;
+      margin-bottom: 10px;
       font-weight: bold;
     }
-    button:hover { background-color: #2980b9; }
-    button:disabled { background-color: #7f8c8d; cursor: not-allowed; }
-    .btn-danger { background-color: #e74c3c; }
-    .btn-danger:hover { background-color: #c0392b; }
-    .btn-warning { background-color: #f1c40f; color: #2c3e50; }
-    .btn-warning:hover { background-color: #f39c12; }
-    .nav-btn { display: inline-block; margin-top: 20px; color: #bdc3c7; text-decoration: none; }
+
+    /* กล่องหลักของเกมถอดตาม Layout ในรูป */
+    .game-zone {
+      width: 100%;
+      max-width: 500px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    /* พื้นที่ของดีลเลอร์และเพลเยอร์ */
+    .section-card {
+      background-color: #bbada0; /* สีน้ำตาลหม่นคลาสสิก */
+      border-radius: 16px;
+      padding: 20px;
+      position: relative;
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      color: white;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+
+    .role-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ป้ายคะแนนมุมขวาบน */
+    .score-badge {
+      background-color: #e5dbd0;
+      color: #776e65;
+      padding: 4px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* กล่องจัดวางไพ่ */
+    .cards-container {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: auto 0;
+      padding: 10px 0;
+    }
+
+    /* ตัวไพ่จำลองทรงโมเดิร์นตามรูป */
+    .card {
+      background: white;
+      width: 70px;
+      height: 105px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      box-sizing: border-box;
+      font-weight: bold;
+      font-size: 1.6rem;
+      user-select: none;
+    }
+
+    .card.red { color: #f65e3b; } /* สีส้มแดงคุมโทน */
+    .card.black { color: #776e65; }
+    .card.hidden-card { color: #e5dbd0; }
+    
+    .card-suit {
+      font-size: 1.4rem;
+    }
+
+    /* ข้อความแจ้งเตือนสถานะกลางจอ */
+    .status-text {
+      text-align: center;
+      font-size: 1.4rem;
+      font-weight: bold;
+      color: #776e65;
+      margin: 15px 0;
+      line-height: 1.4;
+    }
+
+    /* แผงควบคุมปุ่มด้านล่าง */
+    .control-panel {
+      background-color: #bbada0;
+      border-radius: 16px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+    }
+
+    /* สไตล์ปุ่มกดเลียนแบบรูปภาพ */
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      font-size: 1.1rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform 0.1s, opacity 0.2s;
+      width: 100%;
+    }
+
+    button:active { transform: scale(0.98); }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-hit { background-color: #f2b179; color: white; } /* สีส้มอ่อน */
+    .btn-stay { background-color: #f59563; color: white; } /* สีส้มเข้ม */
+    .btn-new { background-color: #8f7a66; color: white; } /* สีน้ำตาลปุ่มหลัก */
+
+    .nav-btn {
+      text-align: center;
+      margin-top: 15px;
+      color: #9e948a;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 0.95rem;
+    }
+    .nav-btn:hover { color: #776e65; }
   </style>
 </head>
 <body>
 
-<div class="game-container">
-  <h1>Blackjack 🃏</h1>
-  
-  <div class="status" id="statusMessage">กด "เริ่มเกม" เพื่อแจกไพ่</div>
+<div class="subtitle">Web Application</div>
+<div class="game-zone">
 
-  <div class="section">
-    <div>เจ้ามือ (Dealer)</div>
-    <div class="cards-display" id="dealerCards">-</div>
-    <div class="score">แต้ม: <span id="dealerScore">0</span></div>
+  <!-- เจ้ามือ (DEALER) -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="role-title">🤵 เจ้ามือ (DEALER)</div>
+      <div class="score-badge" id="dealerScoreBadge">-</div>
+    </div>
+    <div class="cards-container" id="dealerCards">
+      <!-- ไพ่จะถูกเจนจาก JS -->
+    </div>
   </div>
 
-  <div class="section">
-    <div>คุณ (Player)</div>
-    <div class="cards-display" id="playerCards">-</div>
-    <div class="score">แต้ม: <span id="playerScore">0</span></div>
+  <!-- สถานะการเดินเกมส์ -->
+  <div class="status-text" id="statusMessage">ตาของคุณ: จะจั่ว (Hit) หรือ พอ (Stand)?</div>
+
+  <!-- คุณ (PLAYER) -->
+  <div class="section-card">
+    <div class="section-header">
+      <div class="role-title">👤 คุณ (PLAYER)</div>
+      <div class="score-badge" id="playerScoreBadge">- แต้ม</div>
+    </div>
+    <div class="cards-container" id="playerCards">
+      <!-- ไพ่จะถูกเจนจาก JS -->
+    </div>
   </div>
 
-  <div class="controls">
-    <button id="hitBtn" onclick="hit()" disabled>จั่วไพ่ (Hit)</button>
-    <button id="stayBtn" onclick="stay()" disabled>อยู่ (Stay)</button>
-    <button id="startBtn" class="btn-warning" onclick="startNewGame()">เริ่มเกมใหม่</button>
+  <!-- แผงควบคุมปุ่ม -->
+  <div class="control-panel">
+    <div class="action-row">
+      <button class="btn-hit" id="hitBtn" onclick="hit()">🃏 จั่วไพ่ (Hit)</button>
+      <button class="btn-stay" id="stayBtn" onclick="stay()">🛑 พอแล้ว (Stand)</button>
+    </div>
+    <button class="btn-new" id="startBtn" onclick="startNewGame()">🔄 เริ่มตาใหม่ (New Game)</button>
   </div>
 
-  <a href="index.html" class="nav-btn">⬅️ กลับหน้าหลัก</a>
+  <a href="index.html" class="nav-btn">⬅️ กลับหน้าหลัก Workspace</a>
 </div>
 
 <script>
@@ -89,7 +218,13 @@
   let dealerHand = [];
   let gameInProgress = false;
 
-  const suits = ['♠️', '♥️', '♦️', '♣️'];
+  // เปลี่ยนสัญลักษณ์ให้เข้ากับฟอนต์ระบบและสีสันเรียบง่าย
+  const suits = [
+    { symbol: '♠', name: 'spades', isRed: false },
+    { symbol: '♥', name: 'hearts', isRed: true },
+    { symbol: '♦', name: 'diams', isRed: true },
+    { symbol: '♣', name: 'clubs', isRed: false }
+  ];
   const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
 
   function createDeck() {
@@ -110,7 +245,7 @@
 
   function getCardValue(card) {
     if (['J', 'Q', 'K'].includes(card.value)) return 10;
-    if (card.value === 'A') return 11; // คิดเป็น 11 ก่อน เดี๋ยวค่อยลดถ้าเกิน
+    if (card.value === 'A') return 11;
     return parseInt(card.value);
   }
 
@@ -137,25 +272,46 @@
 
     document.getElementById('hitBtn').disabled = false;
     document.getElementById('stayBtn').disabled = false;
-    document.getElementById('statusMessage').innerText = "จะจั่วไพ่เพิ่ม หรือพอแค่นี้?";
-    document.getElementById('statusMessage').style.color = "#f1c40f";
+    document.getElementById('statusMessage').innerText = "ตาของคุณ: จะจั่ว (Hit) หรือ พอ (Stand)?";
 
     updateUI(false);
   }
 
-  function updateUI(showAllDealerCards) {
-    // แสดงไพ่ฝั่งผู้เล่น
-    document.getElementById('playerCards').innerText = playerHand.map(c => c.value + c.suit).join(' ');
-    document.getElementById('playerScore').innerText = calculateScore(playerHand);
-
-    // แสดงไพ่ฝั่งเจ้ามือ
-    if (showAllDealerCards) {
-      document.getElementById('dealerCards').innerText = dealerHand.map(c => c.value + c.suit).join(' ');
-      document.getElementById('dealerScore').innerText = calculateScore(dealerHand);
+  function renderCardDOM(card, isHidden) {
+    const cardDiv = document.createElement('div');
+    cardDiv.classList.add('card');
+    
+    if (isHidden) {
+      cardDiv.classList.add('hidden-card');
+      cardDiv.innerHTML = `<div>?</div><div class="card-suit">🎲</div>`;
     } else {
-      // ซ่อนไพ่ใบแรกของเจ้ามือไว้ตามกฎแบล็กแจ็ก
-      document.getElementById('dealerCards').innerText = "🎴 " + dealerHand[1].value + dealerHand[1].suit;
-      document.getElementById('dealerScore').innerText = "?";
+      cardDiv.classList.add(card.suit.isRed ? 'red' : 'black');
+      cardDiv.innerHTML = `<div>${card.value}</div><div class="card-suit">${card.symbol}</div>`;
+    }
+    return cardDiv;
+  }
+
+  function updateUI(showAllDealerCards) {
+    // อัปเดตไพ่และคะแนนผู้เล่น
+    const playerArea = document.getElementById('playerCards');
+    playerArea.innerHTML = '';
+    playerHand.forEach(card => playerArea.appendChild(renderCardDOM(card, false)));
+    document.getElementById('playerScoreBadge').innerText = calculateScore(playerHand) + " แต้ม";
+
+    // อัปเดตไพ่และคะแนนดีลเลอร์
+    const dealerArea = document.getElementById('dealerCards');
+    dealerArea.innerHTML = '';
+    
+    if (showAllDealerCards) {
+      dealerHand.forEach(card => dealerArea.appendChild(renderCardDOM(card, false)));
+      document.getElementById('dealerScoreBadge').innerText = calculateScore(dealerHand) + " แต้ม";
+    } else {
+      // ซ่อนไพ่ใบแรกตามดีไซน์ต้นฉบับ
+      dealerArea.appendChild(renderCardDOM(dealerHand[0], false));
+      dealerArea.appendChild(renderCardDOM(null, true));
+      
+      // แสดงผลคะแนนแบบโจทย์ในภาพ (แต้มไพ่แรก + ?)
+      document.getElementById('dealerScoreBadge').innerText = getCardValue(dealerHand[0]) + " + ?";
     }
   }
 
@@ -166,14 +322,13 @@
     updateUI(false);
 
     if (pScore > 21) {
-      endGame("คุณแต้มเกิน 21 (Busted)! เจ้ามือชนะ", false);
+      endGame("คุณแต้มเกิน 21 เกินขีดจำกัด! เจ้ามือชนะ", false);
     }
   }
 
   function stay() {
     if (!gameInProgress) return;
     
-    // ดีลเลอร์จั่วเพิ่มจนกว่าแต้มจะได้อย่างน้อย 17
     let dScore = calculateScore(dealerHand);
     while (dScore < 17) {
       dealerHand.push(deck.pop());
@@ -184,13 +339,13 @@
     const pScore = calculateScore(playerHand);
 
     if (dScore > 21) {
-      endGame("เจ้ามือแต้มเกิน! คุณชนะ 🎉", true);
+      endGame("เจ้ามือแต้มเกิน 21! คุณชนะการแมตช์ 🎉", true);
     } else if (pScore > dScore) {
-      endGame("คุณชนะ! แต้มเหนือกว่า 🎉", true);
+      endGame("คุณชนะ! คะแนนของคุณเหนือกว่า 🎉", true);
     } else if (pScore < dScore) {
-      endGame("คุณแพ้! เจ้ามือแต้มมากกว่า", false);
+      endGame("คุณแพ้! เจ้ามือทำแต้มได้สูงกว่า", false);
     } else {
-      endGame("เสมอ! (Push)", null);
+      endGame("ผลออกมาเสมอ! (Push)", null);
     }
   }
 
@@ -201,13 +356,11 @@
     
     const msgElement = document.getElementById('statusMessage');
     msgElement.innerText = message;
-    
-    if (playerWon === true) msgElement.style.color = "#2ecc71";
-    else if (playerWon === false) msgElement.style.color = "#e74c3c";
-    else msgElement.style.color = "#3498db";
-
     updateUI(true);
   }
+
+  // รันเกมทันทีที่เปิดหน้าเว็บ
+  window.onload = startNewGame;
 </script>
 
 </body>
