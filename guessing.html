@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Number Guessing Tournament (All-in-One)</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: #1e252b;
+      color: #e2e8f0;
+      margin: 0;
+      padding: 30px 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.8rem;
+      font-weight: 600;
+      color: #f1f5f9;
+      text-align: center;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      color: #94a3b8;
+      font-size: 0.95rem;
+      margin-bottom: 25px;
+      text-align: center;
+    }
+
+    /* แผงแสดงสถานะ */
+    .controls {
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.95rem;
+      background: #283139;
+      padding: 12px 24px;
+      border-radius: 30px;
+      border: 1px solid #334155;
+    }
+
+    .status-item {
+      color: #94a3b8;
+    }
+
+    .status-item span {
+      font-weight: 600;
+      color: #38bdf8;
+    }
+
+    /* โซนกล่องเล่นเกม */
+    .game-box {
+      background: #283139;
+      padding: 30px 24px;
+      border-radius: 16px;
+      border: 1px solid #334155;
+      text-align: center;
+      box-sizing: border-box;
+      margin-bottom: 35px;
+    }
+
+    .hint-text {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      min-height: 27px;
+      color: #cbd5e1;
+      font-weight: 500;
+    }
+
+    .input-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    input[type="number"] {
+      background-color: #1e252b;
+      border: 1px solid #475569;
+      border-radius: 8px;
+      color: #f8fafc;
+      padding: 10px 16px;
+      font-size: 1.1rem;
+      width: 100px;
+      text-align: center;
+      outline: none;
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
+
+    /* ปุ่มกด */
+    .btn {
+      background-color: #334155;
+      color: #f1f5f9;
+      border: 1px solid #475569;
+      padding: 10px 20px;
+      font-size: 0.95rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn:hover {
+      background-color: #475569;
+      border-color: #64748b;
+    }
+
+    .btn-primary {
+      background-color: #0284c7;
+      border-color: #0369a1;
+    }
+
+    .btn-primary:hover {
+      background-color: #0369a1;
+      border-color: #075985;
+    }
+
+    /* กล่องตารางอันดับสถิติ Leaderboard */
+    .leaderboard-box {
+      background-color: #202930;
+      border-radius: 14px;
+      padding: 24px;
+      border: 1px solid #2d3748;
+      box-sizing: border-box;
+      margin-bottom: 30px;
+    }
+
+    .leaderboard-title {
+      text-align: center;
+      font-size: 1.1rem;
+      color: #f59e0b;
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    th {
+      border-bottom: 1px solid #334155;
+      color: #64748b;
+      padding: 10px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    td {
+      padding: 14px 10px;
+      border-bottom: 1px solid #283139;
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .loading-text {
+      text-align: center;
+      color: #64748b;
+      font-style: italic;
+    }
+
+    /* กล่องคำแนะนำสำหรับนักพัฒนา (GAS Code Container) */
+    .instructions-box {
+      background-color: #1a202c;
+      border: 1px dashed #4a5568;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 40px;
+      text-align: left;
+    }
+
+    .instructions-title {
+      font-size: 1rem;
+      color: #38bdf8;
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .instructions-text {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    pre {
+      background-color: #0f172a;
+      padding: 15px;
+      border-radius: 8px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.8rem;
+      color: #38bdf8;
+      border: 1px solid #1e293b;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>🔢 Number Guessing Game</h1>
+    <div class="subtitle">ทายตัวเลขปริศนาตั้งแต่ 1 ถึง 100</div>
+
+    <div class="controls">
+      <div class="status-item">ทายไปแล้ว: <span id="guess-count">0</span> ครั้ง</div>
+      <div class="status-item">เวลา: <span id="timer-display">0</span> วินาที</div>
+      <button class="btn" onclick="initGame()">รีเซ็ตเกม</button>
+    </div>
+
+    <!-- กล่องเล่นเกม -->
+    <div class="game-box">
+      <div class="hint-text" id="hint-display">ลองใส่ตัวเลขแล้วกดทายดูสิ!</div>
+      
+      <div class="input-group">
+        <input type="number" id="user-input" min="1" max="100" placeholder="1-100" onkeydown="if(event.key==='Enter') checkGuess()">
+        <button class="btn btn-primary" id="submit-btn" onclick="checkGuess()">ทายคำตอบ</button>
+      </div>
+    </div>
+
+    <!-- ตารางอันดับสถิติ Top 10 -->
+    <div class="leaderboard-box">
+      <div class="leaderboard-title">🏆 อันดับสถิติ Top 10</div>
+      <table>
+        <thead>
+          <tr>
+            <th>อันดับ</th>
+            <th>ชื่อผู้เล่น</th>
+            <th>จำนวนครั้งที่ทาย</th>
+            <th>เวลาที่ใช้</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboard-body">
+          <tr>
+            <td colspan="4" class="loading-text">กำลังดึงคะแนนล่าสุด...</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- คำอธิบายและ Backend Code สำหรับ Google Apps Script -->
+    <div class="instructions-box">
+      <div class="instructions-title">💡 คำแนะนำสำหรับฝั่ง Google Apps Script (Code.gs)</div>
+      <div class="instructions-text">
+        เมื่อคุณนำไฟล์ HTML นี้ไปสร้างบน Google Apps Script เป็นไฟล์ชื่อ <code>Index.html</code> แล้ว 
+        กรุณาใช้โค้ดด้านล่างนี้ในไฟล์ <code>Code.gs</code> (หรือ <code>รหัส.gs</code>) เพื่อเป็นฝั่ง Server-side ในการบันทึกและดึงข้อมูลจาก Google Sheets:
+      </div>
+      <pre>
+// ==========================================
+// ส่วนของโค้ดที่ต้องใส่ในไฟล์ Code.gs (Apps Script)
+// ==========================================
+
+const SPREADSHEET_ID = '1ryJDHmWyttWLcqV6A-jYxuiAm5k27yY2WGjVtOiTOJ8'; 
+
+function doGet() {
+  return HtmlService.createHtmlOutputFromFile('Index')
+      .setTitle('Number Guessing Tournament')
+      .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function saveScore(playerName, guesses, timeUsed) {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheets()[2]; 
+    sheet.appendRow([playerName, parseInt(guesses), parseInt(timeUsed), new Date()]);
+    return true;
+  } catch(e) {
+    Logger.log("Error saveScore: " + e.toString());
+    return false;
+  }
+}
+
+function getLeaderboard() {
+  try {
+    const ss = SpreadsheetApp.openById(SPREADSHEET_ID);
+    const sheet = ss.getSheets()[2];
+    const data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return [];
+    
+    const scores = [];
+    for (let i = 1; i < data.length; i++) {
+      const row = data[i];
+      if (row[0] && !isNaN(parseInt(row[1])) && !isNaN(parseInt(row[2]))) {
+        scores.push({
+          name: row[0].toString(),
+          clicks: parseInt(row[1]),
+          timeUsed: parseInt(row[2])
+        });
+      }
+    }
+    
+    scores.sort((a, b) => {
+      if (a.clicks === b.clicks) return a.timeUsed - b.timeUsed;
+      return a.clicks - b.clicks;
+    });
+    
+    return scores.slice(0, 10);
+  } catch(e) {
+    Logger.log("Error getLeaderboard: " + e.toString());
+    return [];
+  }
+}
+      </pre>
+    </div>
+  </div>
+
+  <script>
+    let targetNumber = 0;
+    let totalGuesses = 0;
+    let timeSeconds = 0;
+    let timerInterval = null;
+    let isGameActive = false;
+    let isGameOver = false;
+
+    // 1. เริ่มต้นเกมใหม่
+    function initGame() {
+      targetNumber = Math.floor(Math.random() * 100) + 1; // สุ่ม 1-100
+      totalGuesses = 0;
+      timeSeconds = 0;
+      isGameActive = false;
+      isGameOver = false;
+
+      clearInterval(timerInterval);
+      
+      document.getElementById('guess-count').innerText = totalGuesses;
+      document.getElementById('timer-display').innerText = timeSeconds;
+      document.getElementById('hint-display').innerText = "เกมเริ่มแล้ว! ลองใส่ตัวเลขเดาดูสิ (1-100)";
+      
+      const inputField = document.getElementById('user-input');
+      inputField.value = '';
+      inputField.disabled = false;
+      document.getElementById('submit-btn').disabled = false;
+      inputField.focus();
+    }
+
+    // 2. เริ่มนับเวลาเมื่อทายครั้งแรก
+    function startTimer() {
+      isGameActive = true;
+      timerInterval = setInterval(() => {
+        timeSeconds++;
+        document.getElementById('timer-display').innerText = timeSeconds;
+      }, 1000);
+    }
+
+    // 3. ฟังก์ชันตรวจสอบคำตอบ
+    function checkGuess() {
+      if (isGameOver) return;
+
+      const inputField = document.getElementById('user-input');
+      const userGuess = parseInt(inputField.value);
+
+      // ตรวจสอบความถูกต้องของ Input
+      if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+        alert("กรุณาใส่ตัวเลขระหว่าง 1 ถึง 100 เท่านั้นครับ");
+        return;
+      }
+
+      // เริ่มเวลาเมื่อกดยืนยันตัวเลขครั้งแรก
+      if (!isGameActive) {
+        startTimer();
+      }
+
+      totalGuesses++;
+      document.getElementById('guess-count').innerText = totalGuesses;
+
+      const hintDisplay = document.getElementById('hint-display');
+
+      if (userGuess === targetNumber) {
+        // ทายถูก (จบเกม)
+        isGameOver = true;
+        clearInterval(timerInterval);
+        hintDisplay.innerHTML = `<span style="color: #10b981;">🎉 ถูกต้องแล้ว! ตัวเลขคือ \${targetNumber}</span>`;
+        inputField.disabled = true;
+        document.getElementById('submit-btn').disabled = true;
+        
+        setTimeout(handleGameWin, 400);
+      } else if (userGuess < targetNumber) {
+        hintDisplay.innerHTML = `📉 น้อยเกินไป! (มากกว่า \${userGuess})`;
+        inputField.value = '';
+        inputField.focus();
+      } else {
+        hintDisplay.innerHTML = `📈 มากเกินไป! (น้อยกว่า \${userGuess})`;
+        inputField.value = '';
+        inputField.focus();
+      }
+    }
+
+    // 4. บันทึกผลลัพธ์ลง Sheets
+    function handleGameWin() {
+      const playerName = prompt(`ยินดีด้วยคุณทายถูก!\nจำนวนครั้งที่ทาย: \${totalGuesses} ครั้ง\nเวลาที่ใช้: \${timeSeconds} วินาที\nกรุณาใส่ชื่อของคุณเพื่อบันทึกสถิติ:`);
+      
+      if (playerName && playerName.trim() !== "") {
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          google.script.run.withSuccessHandler(function(success) {
+            if (success) {
+              alert("บันทึกสถิติสำเร็จ!");
+              loadLeaderboard();
+            } else {
+              alert("เกิดข้อผิดพลาดในการบันทึกสถิติหลังบ้าน");
+            }
+          }).saveScore(playerName.trim(), totalGuesses, timeSeconds);
+        } else {
+          // จำลองการทำงานเมื่อทดสอบในเบราว์เซอร์ปกติแบบไม่มี Google Apps Script Environment
+          alert("บันทึกสถิติสำเร็จ! (ระบบจำลองบน Browser: " + playerName + ")");
+          loadLeaderboardMock(playerName.trim(), totalGuesses, timeSeconds);
+        }
+      } else {
+        alert("ไม่ได้ระบุชื่อ ระบบจึงไม่ได้บันทึกคะแนน");
+      }
+    }
+
+    // ตารางคะแนนจำลอง (กรณีไม่ได้เปิดผ่าน Google Apps Script)
+    let mockLeaderboard = [
+      { name: "Somsak", clicks: 3, timeUsed: 12 },
+      { name: "Anong", clicks: 5, timeUsed: 18 },
+      { name: "Piti", clicks: 7, timeUsed: 25 }
+    ];
+
+    function loadLeaderboardMock(name, clicks, time) {
+      mockLeaderboard.push({ name: name, clicks: clicks, timeUsed: time });
+      mockLeaderboard.sort((a, b) => {
+        if (a.clicks === b.clicks) return a.timeUsed - b.timeUsed;
+        return a.clicks - b.clicks;
+      });
+      renderLeaderboardTable(mockLeaderboard.slice(0, 10));
+    }
+
+    function renderLeaderboardTable(data) {
+      let html = "";
+      if (!data || data.length === 0) {
+        html = `<tr><td colspan="4" class="loading-text">ยังไม่มีสถิติในขณะนี้</td></tr>`;
+      } else {
+        data.forEach(function(item, index) {
+          html += `<tr>
+            <td>\${index + 1}</td>
+            <td>\${item.name}</td>
+            <td>\${item.clicks} ครั้ง</td>
+            <td>\${item.timeUsed} วินาที</td>
+          </tr>`;
+        });
+      }
+      document.getElementById("leaderboard-body").innerHTML = html;
+    }
+
+    // 5. ดึงตารางคะแนนมาแสดงผล
+    function loadLeaderboard() {
+      if (typeof google !== 'undefined' && google.script && google.script.run) {
+        document.getElementById("leaderboard-body").innerHTML = `<tr><td colspan="4" class="loading-text">กำลังดึงคะแนนล่าสุด...</td></tr>`;
+        google.script.run.withSuccessHandler(function(data) {
+          renderLeaderboardTable(data);
+        }).getLeaderboard();
+      } else {
+        // ใช้ข้อมูลจำลองถ้าเปิดใน browser ทั่วไป
+        renderLeaderboardTable(mockLeaderboard);
+      }
+    }
+
+    window.onload = function() {
+      initGame();
+      loadLeaderboard();
+    };
+  </script>
+</body>
+</html>
